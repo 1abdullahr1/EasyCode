@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/card_stroke"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:padding="8dp">
+
+        <!-- 16:9 Thumbnail -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_thumbnail"
+            android:layout_width="120dp"
+            android:layout_height="0dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="16:9"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeWidth="0dp">
+
+            <ImageView
+                android:id="@+id/lecture_thumbnail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                tools:srcCompat="@drawable/playlist_placeholder" />
+
+            <TextView
+                android:id="@+id/lecture_number_badge"
+                style="@style/DurationBadge"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="4dp"
+                android:background="@drawable/rounded_ripple"
+                android:backgroundTint="@color/duration_background_color"
+                tools:text="#01" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Lecture Title -->
+        <TextView
+            android:id="@+id/lecture_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/ic_play_btn"
+            app:layout_constraintStart_toEndOf="@id/card_thumbnail"
+            app:layout_constraintTop_toTopOf="@id/card_thumbnail"
+            tools:text="Lecture 01 - Introduction to Course" />
+
+        <!-- Status / Completed Tag -->
+        <TextView
+            android:id="@+id/lecture_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@id/card_thumbnail"
+            app:layout_constraintStart_toEndOf="@id/card_thumbnail"
+            app:layout_constraintTop_toBottomOf="@id/lecture_title"
+            app:layout_constraintVertical_bias="1.0"
+            tools:text="Tap to play" />
+
+        <!-- Play Icon Button -->
+        <ImageView
+            android:id="@+id/ic_play_btn"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_play"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/colorPrimary" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

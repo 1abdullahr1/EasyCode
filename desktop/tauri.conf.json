@@ -1,0 +1,72 @@
+{
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
+    "devPath": "./ui",
+    "distDir": "./ui",
+    "withGlobalTauri": true
+  },
+  "package": {
+    "productName": "VU Course Hub",
+    "version": "1.0.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "all": false,
+        "open": true
+      }
+    },
+    "bundle": {
+      "active": false,
+      "category": "Education",
+      "copyright": "Virtual University of Pakistan",
+      "deb": {
+        "depends": []
+      },
+      "externalBin": [],
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.ico",
+        "icons/icon.png"
+      ],
+      "identifier": "com.vucoursehub.desktop",
+      "longDescription": "VU Course Hub Native Windows Desktop Application",
+      "macOS": {
+        "frameworks": [],
+        "minimumSystemVersion": "",
+        "exceptionDomain": "",
+        "signingIdentity": null,
+        "providerShortName": null,
+        "entitlements": null
+      },
+      "resources": [],
+      "shortDescription": "VU Course Hub",
+      "targets": "all",
+      "windows": {
+        "certificateThumbprint": null,
+        "digestAlgorithm": "sha256",
+        "timestampUrl": ""
+      }
+    },
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      {
+        "label": "main",
+        "url": "index.html",
+        "fullscreen": false,
+        "height": 820,
+        "resizable": true,
+        "title": "VU Course Hub",
+        "width": 1280,
+        "minHeight": 600,
+        "minWidth": 900
+      }
+    ]
+  }
+}

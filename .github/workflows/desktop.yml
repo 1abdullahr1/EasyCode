@@ -1,0 +1,44 @@
+name: Build Windows Desktop App
+
+on:
+  push:
+    branches: [ "**" ]
+    paths:
+      - "desktop/**"
+      - ".github/workflows/desktop.yml"
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Build Native Windows Executable
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop
+
+      - name: Build Release Binary
+        run: cargo build --release --manifest-path desktop/Cargo.toml --target x86_64-pc-windows-msvc
+
+      - name: Stage Artifact
+        shell: pwsh
+        run: |
+          mkdir -p dist
+          cp desktop/target/x86_64-pc-windows-msvc/release/vu-course-hub.exe dist/
+
+      - name: Upload Windows Executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: vu-course-hub-windows-x64
+          path: dist/*
+          retention-days: 14

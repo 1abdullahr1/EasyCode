@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand / Primary Colors (VU Blue Sapphire) -->
+    <color name="primary">#0058CB</color>
+    <color name="onPrimary">#FFFFFF</color>
+    <color name="primaryContainer">#D9E2FF</color>
+    <color name="onPrimaryContainer">#001945</color>
+
+    <color name="secondary">#575E71</color>
+    <color name="onSecondary">#FFFFFF</color>
+    <color name="secondaryContainer">#DCE2F9</color>
+    <color name="onSecondaryContainer">#141B2C</color>
+
+    <color name="tertiary">#006874</color>
+    <color name="onTertiary">#FFFFFF</color>
+    <color name="tertiaryContainer">#9EEFFD</color>
+    <color name="onTertiaryContainer">#001F24</color>
+
+    <color name="background">#FDFBFF</color>
+    <color name="onBackground">#1A1B1F</color>
+    <color name="surface">#FDFBFF</color>
+    <color name="onSurface">#1A1B1F</color>
+    <color name="surfaceVariant">#E1E2EC</color>
+    <color name="onSurfaceVariant">#44474F</color>
+    <color name="outline">#74777F</color>
+
+    <!-- Dark Theme Colors -->
+    <color name="dark_primary">#B0C6FF</color>
+    <color name="dark_onPrimary">#002D6F</color>
+    <color name="dark_primaryContainer">#00429B</color>
+    <color name="dark_onPrimaryContainer">#D9E2FF</color>
+    <color name="dark_background">#1A1B1F</color>
+    <color name="dark_onBackground">#E3E2E6</color>
+    <color name="dark_surface">#1A1B1F</color>
+    <color name="dark_onSurface">#E3E2E6</color>
+    <color name="dark_surfaceVariant">#44474F</color>
+    <color name="dark_onSurfaceVariant">#C4C6D0</color>
+
+    <!-- LibreTube Duration Badge & Overlay Colors -->
+    <color name="duration_background_color">#CC000000</color>
+    <color name="duration_text_color">#FFFFFF</color>
+    <color name="chip_background">#E8EDF9</color>
+    <color name="chip_text">#0058CB</color>
+    <color name="accent_gold">#F9A825</color>
+    <color name="card_stroke">#15000000</color>
+    <color name="shortcut_color">#0058CB</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="nav_active_indicator">#A6C8FF</color>
+
+</resources>

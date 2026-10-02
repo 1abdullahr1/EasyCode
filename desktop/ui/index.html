@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VU Course Hub</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body class="theme-dark">
+  <div class="app-layout">
+    <!-- Left Sidebar (Collapsible) -->
+    <aside id="app-sidebar" class="sidebar">
+      <div class="sidebar-top">
+        <!-- Brand Header: Text Only (VU OCW) without square logo -->
+        <div class="brand-header">
+          <div class="brand-text-only">
+            <h1 class="brand-ocw-title">VU OCW</h1>
+            <p class="brand-subtitle">Virtual University</p>
+          </div>
+          <button id="btn-sidebar-toggle" class="sidebar-toggle-btn" title="Collapse Sidebar">
+            <svg class="toggle-icon-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <nav class="nav-menu">
+          <button class="nav-item active" data-tab="home" title="Learn">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+            </span>
+            <span class="nav-label">Learn</span>
+          </button>
+          <button class="nav-item" data-tab="courses" title="Explore Courses">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </span>
+            <span class="nav-label">Explore Courses</span>
+          </button>
+          <button class="nav-item" data-tab="player" title="Lecture Player">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </span>
+            <span class="nav-label">Lecture Player</span>
+            <span id="player-indicator" class="active-dot hidden"></span>
+          </button>
+          <button class="nav-item" data-tab="saved" title="My Learning">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </span>
+            <span class="nav-label">My Learning</span>
+            <span id="saved-badge" class="count-badge hidden">0</span>
+          </button>
+          <button class="nav-item" data-tab="resources" title="Resources">
+            <span class="nav-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+            </span>
+            <span class="nav-label">Resources</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+          <span class="theme-label">Theme</span>
+          <span id="theme-status" class="theme-val">Dark</span>
+        </button>
+        <div class="version-badge">Native Desktop • Tauri</div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+      <!-- 1. Learn View (Matches Android HomeFragment Dual States) -->
+      <section id="view-home" class="view-panel active">
+        <!-- State A: Active Learning Dashboard (When user has watched or bookmarked courses) -->
+        <div id="home-active-dashboard" class="home-active-container hidden">
+          <!-- Hero Continue Learning Card (Matches Android card_hero_course) -->
+          <div class="hero-course-card" id="hero-course-card">
+            <div class="hero-thumb-wrapper">
+              <img id="hero-course-thumb" src="" alt="Course Thumbnail" class="hero-course-img" onerror="this.src='icons/icon.png'">
+              <span id="hero-course-duration" class="hero-duration-badge">45 Lectures</span>
+              <div class="hero-play-overlay">
+                <div class="play-icon-circle">PLAY</div>
+              </div>
+            </div>
+            <div class="hero-card-content">
+              <div class="hero-meta-dept" id="hero-course-dept">Computer Science • Virtual University</div>
+              <h2 class="hero-course-title" id="hero-course-title">CS201 - Introduction to Programming</h2>
+              <div class="hero-progress-row">
+                <span class="hero-progress-label" id="hero-course-progress">Progress: Lecture 01 of 45</span>
+                <div class="hero-progress-track">
+                  <div class="hero-progress-bar" id="hero-progress-bar" style="width: 2%;"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Resume Course Action Ribbon (Matches Android btn_resume_course) -->
+            <div class="hero-resume-ribbon" id="btn-hero-resume">
+              <div class="resume-ribbon-left">
+                <span class="ribbon-tag">Resume Course</span>
+                <span class="ribbon-lec-title" id="hero-resume-lec-title">Lecture 01 - Introduction</span>
+              </div>
+              <button class="btn-resume-action">Continue Watching &rarr;</button>
+            </div>
+          </div>
+
+          <!-- My Enrolled Courses Section (Horizontal Carousel) -->
+          <div class="section-block" id="home-my-courses-section">
+            <div class="section-header">
+              <h3 class="section-title" id="home-my-courses-title">My Courses</h3>
+              <button class="link-btn" onclick="switchTab('saved')">View All &rarr;</button>
+            </div>
+            <div id="home-enrolled-carousel" class="enrolled-carousel"></div>
+          </div>
+
+          <!-- Recommended Courses Section -->
+          <div class="section-block">
+            <div class="section-header">
+              <h3 class="section-title">Recommended Courses</h3>
+              <button class="link-btn" onclick="switchTab('courses')">Explore All &rarr;</button>
+            </div>
+            <div id="home-featured-grid" class="cards-grid"></div>
+          </div>
+        </div>
+
+        <!-- State B: New User Empty State (Matches Android layout_empty_state) -->
+        <div id="home-empty-dashboard" class="home-empty-container">
+          <div class="hero-banner">
+            <div class="hero-content">
+              <span class="hero-chip">Official Educational Portal</span>
+              <h2 class="hero-title">Empower Your Learning</h2>
+              <p class="hero-desc">Access thousands of high-definition video lectures, course outlines, handouts, and official study materials from Virtual University of Pakistan.</p>
+              <div class="hero-actions">
+                <button id="hero-find-btn" class="btn btn-primary" onclick="switchTab('courses')">Find a Course</button>
+                <button class="btn btn-secondary" onclick="switchTab('resources')">Browse Resources</button>
+              </div>
+            </div>
+            <div class="hero-art">
+              <img src="assets/il_learn.png" alt="Learn" onerror="this.style.display='none'">
+            </div>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-val" id="stat-courses">512+</div>
+              <div class="stat-name">Academic Courses</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val" id="stat-depts">39</div>
+              <div class="stat-name">Departments</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val">20,000+</div>
+              <div class="stat-name">HD Video Lectures</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val">Free</div>
+              <div class="stat-name">Official Open Access</div>
+            </div>
+          </div>
+
+          <div class="section-block">
+            <div class="section-header">
+              <h3 class="section-title">Popular Courses</h3>
+              <button class="link-btn" onclick="switchTab('courses')">View All &rarr;</button>
+            </div>
+            <div id="home-empty-featured-grid" class="cards-grid"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Explore Courses View -->
+      <section id="view-courses" class="view-panel">
+        <div class="courses-header">
+          <div>
+            <h2 class="page-title">Explore All Courses</h2>
+            <p class="page-subtitle" id="courses-count-text">Showing courses</p>
+          </div>
+          <div class="search-box">
+            <input type="text" id="course-search-input" placeholder="Search by course code, title, or department...">
+            <button id="search-clear-btn" class="clear-btn hidden">&times;</button>
+          </div>
+        </div>
+
+        <div id="dept-pills-bar" class="dept-pills-container"></div>
+        <div id="courses-grid" class="cards-grid"></div>
+      </section>
+
+      <!-- 3. Lecture Player View (with Collapsible Playlist, Explicit Fullscreen, and 1x-4x Speed Controls) -->
+      <section id="view-player" class="view-panel">
+        <div id="player-active-state" class="player-layout">
+          <!-- Left Column: Video & Controls -->
+          <div class="player-stage">
+            <div class="video-container" id="video-container-box">
+              <iframe
+                id="player-iframe"
+                src=""
+                title="VU Course Lecture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+              </iframe>
+              <div id="player-placeholder" class="video-placeholder">
+                <div class="placeholder-play-circle">PLAY</div>
+                <div class="placeholder-title" id="placeholder-lec-title">Ready to Play</div>
+                <div class="placeholder-sub">Click any lecture or Play Video to start</div>
+              </div>
+            </div>
+
+            <div class="player-toolbar">
+              <div class="toolbar-left">
+                <button id="btn-play-video" class="btn btn-primary btn-sm">Play</button>
+                <button id="btn-prev-lec" class="btn btn-secondary btn-sm" title="Previous Lecture">&larr; Prev</button>
+                <button id="btn-next-lec" class="btn btn-secondary btn-sm" title="Next Lecture">Next &rarr;</button>
+
+                <!-- Compact Speed Changer: [-] 1.0x [+] with range 1x to 4x -->
+                <div class="speed-stepper-control" title="Playback Speed (1x to 4x)">
+                  <button id="btn-speed-down" class="btn-stepper" title="Decrease Speed">-</button>
+                  <span id="speed-display" class="speed-label" title="Click to cycle speed">1.0x</span>
+                  <button id="btn-speed-up" class="btn-stepper" title="Increase Speed">+</button>
+                </div>
+              </div>
+
+              <div class="toolbar-right">
+                <button id="btn-toggle-playlist" class="btn btn-secondary btn-sm" title="Toggle Course Playlist">
+                  <span id="playlist-toggle-label">Hide Playlist</span>
+                </button>
+                <button id="btn-fullscreen" class="btn btn-secondary btn-sm" title="Fullscreen Video">
+                  Fullscreen
+                </button>
+                <button id="btn-open-browser" class="btn btn-outline btn-sm">Open in Browser</button>
+              </div>
+            </div>
+
+            <div class="course-meta-box">
+              <div class="meta-tags">
+                <span id="player-course-code" class="chip chip-primary">CODE</span>
+                <span id="player-course-dept" class="meta-dept">Department</span>
+              </div>
+              <h3 id="player-course-title" class="meta-title">Course Title</h3>
+              <p id="player-active-lec-title" class="meta-lec">Lecture 01</p>
+            </div>
+          </div>
+
+          <!-- Right Column: Collapsible Playlist -->
+          <aside class="player-playlist" id="player-playlist-panel">
+            <div class="playlist-header">
+              <div class="playlist-header-left">
+                <h4 class="playlist-title">Course Playlist</h4>
+                <span id="playlist-count" class="playlist-count">0 lectures</span>
+              </div>
+              <button id="btn-close-playlist" class="playlist-close-btn" title="Collapse Playlist">&times;</button>
+            </div>
+            <div id="playlist-items-list" class="playlist-scroll-list"></div>
+          </aside>
+        </div>
+
+        <div id="player-empty-state" class="empty-state-panel hidden">
+          <h3>No Course Selected</h3>
+          <p>Choose any course from Explore Courses or My Learning to start watching.</p>
+          <button class="btn btn-primary" onclick="switchTab('courses')">Browse Courses</button>
+        </div>
+      </section>
+
+      <!-- 4. My Learning View (Matches Android SavedFragment with Bookmarks, My Courses, and History) -->
+      <section id="view-saved" class="view-panel">
+        <div class="page-top">
+          <div>
+            <h2 class="page-title">My Learning</h2>
+            <p class="page-subtitle">Your enrolled courses, bookmarks, and watch history.</p>
+          </div>
+          <!-- Segmented Filter Pills -->
+          <div class="segment-filter-bar">
+            <button class="segment-pill active" data-subtab="all">All</button>
+            <button class="segment-pill" data-subtab="courses">My Courses</button>
+            <button class="segment-pill" data-subtab="bookmarks">Bookmarks</button>
+            <button class="segment-pill" data-subtab="history">Watch History</button>
+          </div>
+        </div>
+
+        <!-- Populated State -->
+        <div id="saved-content-wrapper" class="saved-content-scroll">
+          <!-- Section 1: My Courses (Enrolled / Active Watching) -->
+          <div id="section-my-courses" class="learning-section">
+            <div class="section-header">
+              <h3 class="section-title">My Courses</h3>
+              <span id="count-my-courses" class="section-badge">0</span>
+            </div>
+            <div id="grid-my-courses" class="cards-grid"></div>
+          </div>
+
+          <!-- Section 2: Bookmarked Courses -->
+          <div id="section-bookmarked" class="learning-section">
+            <div class="section-header">
+              <h3 class="section-title">Bookmarked Courses</h3>
+              <span id="count-bookmarked" class="section-badge">0</span>
+            </div>
+            <div id="grid-bookmarked" class="cards-grid"></div>
+          </div>
+
+          <!-- Section 3: Watch History -->
+          <div id="section-history" class="learning-section">
+            <div class="section-header">
+              <div class="header-left">
+                <h3 class="section-title">Watch History</h3>
+                <span id="count-history" class="section-badge">0</span>
+              </div>
+              <button id="btn-clear-history" class="btn btn-outline btn-sm">Clear History</button>
+            </div>
+            <div id="list-watch-history" class="history-list"></div>
+          </div>
+        </div>
+
+        <!-- Empty State (Matches Android layout_empty_my_learning) -->
+        <div id="saved-empty-state" class="empty-state-panel hidden">
+          <img src="assets/il_my_learning.png" alt="My Learning" class="empty-art" onerror="this.style.display='none'">
+          <h3>No Courses Yet</h3>
+          <p>Bookmark courses or start watching lectures to build your personal learning library.</p>
+          <button class="btn btn-primary" onclick="switchTab('courses')">Explore Courses</button>
+        </div>
+      </section>
+
+      <!-- 5. Unified Resources View (Merged Handouts + Links + Tools) -->
+      <section id="view-resources" class="view-panel">
+        <div class="courses-header">
+          <div>
+            <h2 class="page-title">Resources</h2>
+            <p class="page-subtitle">Official VU Handouts, Portals, and Academic Tools</p>
+          </div>
+          <div class="search-box">
+            <input type="text" id="resource-search-input" placeholder="Search handouts, portals, or tools...">
+            <button id="resource-search-clear" class="clear-btn hidden">&times;</button>
+          </div>
+        </div>
+
+        <!-- Sub-tab Selector for Resources -->
+        <div class="resources-subtabs-bar">
+          <button class="resource-tab-btn active" data-res-tab="handouts">Handouts (PDF)</button>
+          <button class="resource-tab-btn" data-res-tab="portals">VU Portals</button>
+          <button class="resource-tab-btn" data-res-tab="tools">Academic Tools</button>
+        </div>
+
+        <!-- Resources Content Area -->
+        <div id="resource-tab-handouts" class="res-tab-pane active">
+          <div id="handouts-grid" class="cards-grid"></div>
+        </div>
+
+        <div id="resource-tab-portals" class="res-tab-pane hidden">
+          <div id="portals-grid" class="cards-grid"></div>
+        </div>
+
+        <div id="resource-tab-tools" class="res-tab-pane hidden">
+          <div id="tools-grid" class="cards-grid"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

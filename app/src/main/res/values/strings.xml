@@ -1,0 +1,81 @@
+<resources>
+    <string name="app_name">VU OCW</string>
+    <string name="nav_home">Learn</string>
+    <string name="nav_courses">Discover</string>
+    <string name="nav_saved">Saved</string>
+    <string name="search_hint">What do you want to learn?</string>
+    <string name="continue_watching">Continue Watching</string>
+    <string name="popular_departments">Popular Subjects</string>
+    <string name="all_courses">All Courses</string>
+    <string name="no_courses_found">No courses found matching your query</string>
+    <string name="no_saved_courses">No saved courses yet</string>
+    <string name="no_saved_courses_desc">Bookmark courses to access them quickly here.</string>
+    <string name="lectures_count">%d lectures</string>
+    <string name="enroll_course">Bookmark</string>
+    <string name="enrolled_course">Bookmarked</string>
+    <string name="course_lectures">Course Lectures</string>
+    <string name="disclaimer_title">Disclaimer</string>
+    <string name="disclaimer_content">This is an unofficial student educational app. All video lectures are streamed via the YouTube Embedded Player API from the official Virtual University of Pakistan channel.</string>
+
+    <!-- Learn Tab Strings -->
+    <string name="no_courses_title">No Courses</string>
+    <string name="no_courses_desc">You are not currently enrolled in any courses, would you like to explore the course catalog?</string>
+    <string name="find_a_course">Find a Course</string>
+    <string name="resume_course">Resume Course</string>
+    <string name="view_all_my_courses">View All My Courses (%d)</string>
+    <string name="view_all">View All</string>
+
+    <!-- Discover Tab Strings -->
+    <string name="explore_the_catalog">Explore the catalog</string>
+    <string name="advance_your_career">Advance your\ncareer.</string>
+    <string name="search_action">Search</string>
+    <string name="trending_label">Trending:</string>
+    <string name="filter_by_popular_subjects">Filter by popular subjects</string>
+    <string name="explore_courses_and_programs">Explore all courses</string>
+    <string name="most_popular_programs">Most popular courses</string>
+    <string name="trending_now">Trending now</string>
+    <string name="play">Play</string>
+
+    <!-- My Learning Tab Strings -->
+    <string name="my_learning">My Learning</string>
+    <string name="your_courses">Your Courses</string>
+    <string name="bookmarked">Bookmarked</string>
+    <string name="recently_watched">Recently Watched</string>
+    <string name="see_all">See all</string>
+    <string name="show_less">Show less</string>
+    <string name="clear">Clear</string>
+    <string name="continue_lecture_format">Continue: Lecture %d</string>
+    <string name="progress_format">Progress: %d%%</string>
+    <string name="empty_my_learning_title">Start Your Learning Journey</string>
+    <string name="empty_my_learning_desc">Courses you study, bookmarks, and recently watched lectures will appear here.</string>
+    <string name="explore_courses">Explore Courses</string>
+    <string name="clear_history_title">Clear Watch History</string>
+    <string name="clear_history_message">Are you sure you want to clear your recently watched lectures history?</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Resources Screen Strings -->
+    <string name="resources">Resources</string>
+    <string name="tab_handouts">Handouts</string>
+    <string name="tab_links">Links</string>
+    <string name="tab_tools">Tools</string>
+    <string name="search_resources_hint">Search handouts, links, tools...</string>
+    <string name="no_resources_found">No resources found</string>
+    <string name="no_resources_found_desc">Try searching with a different keyword.</string>
+    <string name="open_link">Open Link</string>
+    <string name="download">Download</string>
+    <string name="open_tool">Open Tool</string>
+    <string name="tool_placeholder_title">Tool Information</string>
+    <string name="tool_placeholder_desc">This educational tool will be fully interactive in the upcoming update.</string>
+    <string name="close">Close</string>
+
+    <!-- Onboarding Strings -->
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_title_1">100% Free &amp; No Ads</string>
+    <string name="onboarding_desc_1">Study without interruptions or paywalls.</string>
+    <string name="onboarding_title_2">All VU Lectures &amp; Handouts</string>
+    <string name="onboarding_desc_2">475+ courses and direct handouts in one place.</string>
+    <string name="onboarding_title_3">Fast Resume &amp; Bookmarks</string>
+    <string name="onboarding_desc_3">Track your progress and resume anytime.</string>
+</resources>
