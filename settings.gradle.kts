@@ -20,5 +20,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "VULectureHub"
+rootProject.name = "EasyCode"
 include(":app")

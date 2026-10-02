@@ -1,50 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand / Primary Colors (VU Blue Sapphire) -->
-    <color name="primary">#0058CB</color>
+    <!-- Brand / Primary Accent (JSFiddle Amber/Orange) -->
+    <color name="primary">#F59E0B</color>
     <color name="onPrimary">#FFFFFF</color>
-    <color name="primaryContainer">#D9E2FF</color>
-    <color name="onPrimaryContainer">#001945</color>
+    <color name="primaryContainer">#FEF3C7</color>
+    <color name="onPrimaryContainer">#78350F</color>
 
-    <color name="secondary">#575E71</color>
+    <color name="secondary">#0284C7</color>
     <color name="onSecondary">#FFFFFF</color>
-    <color name="secondaryContainer">#DCE2F9</color>
-    <color name="onSecondaryContainer">#141B2C</color>
+    <color name="secondaryContainer">#E0F2FE</color>
+    <color name="onSecondaryContainer">#0369A1</color>
 
-    <color name="tertiary">#006874</color>
+    <color name="tertiary">#10B981</color>
     <color name="onTertiary">#FFFFFF</color>
-    <color name="tertiaryContainer">#9EEFFD</color>
-    <color name="onTertiaryContainer">#001F24</color>
+    <color name="tertiaryContainer">#D1FAE5</color>
+    <color name="onTertiaryContainer">#065F46</color>
 
-    <color name="background">#FDFBFF</color>
-    <color name="onBackground">#1A1B1F</color>
-    <color name="surface">#FDFBFF</color>
-    <color name="onSurface">#1A1B1F</color>
-    <color name="surfaceVariant">#E1E2EC</color>
-    <color name="onSurfaceVariant">#44474F</color>
-    <color name="outline">#74777F</color>
+    <!-- Surfaces & Backgrounds -->
+    <color name="background">#F8FAFC</color>
+    <color name="onBackground">#0F172A</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="onSurface">#0F172A</color>
+    <color name="surfaceVariant">#F1F5F9</color>
+    <color name="onSurfaceVariant">#475569</color>
+    <color name="outline">#CBD5E1</color>
 
-    <!-- Dark Theme Colors -->
-    <color name="dark_primary">#B0C6FF</color>
-    <color name="dark_onPrimary">#002D6F</color>
-    <color name="dark_primaryContainer">#00429B</color>
-    <color name="dark_onPrimaryContainer">#D9E2FF</color>
-    <color name="dark_background">#1A1B1F</color>
-    <color name="dark_onBackground">#E3E2E6</color>
-    <color name="dark_surface">#1A1B1F</color>
-    <color name="dark_onSurface">#E3E2E6</color>
-    <color name="dark_surfaceVariant">#44474F</color>
-    <color name="dark_onSurfaceVariant">#C4C6D0</color>
+    <!-- Dark Theme (IDE Preferred) -->
+    <color name="dark_primary">#F59E0B</color>
+    <color name="dark_onPrimary">#18181B</color>
+    <color name="dark_primaryContainer">#78350F</color>
+    <color name="dark_onPrimaryContainer">#FDE68A</color>
+    <color name="dark_background">#121216</color>
+    <color name="dark_onBackground">#F4F4F5</color>
+    <color name="dark_surface">#18181E</color>
+    <color name="dark_onSurface">#F4F4F5</color>
+    <color name="dark_surfaceVariant">#24242E</color>
+    <color name="dark_onSurfaceVariant">#A1A1AA</color>
+    <color name="dark_outline">#3F3F46</color>
 
-    <!-- LibreTube Duration Badge & Overlay Colors -->
-    <color name="duration_background_color">#CC000000</color>
-    <color name="duration_text_color">#FFFFFF</color>
-    <color name="chip_background">#E8EDF9</color>
-    <color name="chip_text">#0058CB</color>
-    <color name="accent_gold">#F9A825</color>
-    <color name="card_stroke">#15000000</color>
-    <color name="shortcut_color">#0058CB</color>
-    <color name="ic_launcher_background">#FFFFFF</color>
-    <color name="nav_active_indicator">#A6C8FF</color>
+    <!-- Code Editor Specific Colors -->
+    <color name="editor_background">#18181E</color>
+    <color name="editor_text">#F4F4F5</color>
+    <color name="editor_gutter_bg">#131317</color>
+    <color name="editor_gutter_text">#71717A</color>
+    <color name="editor_cursor">#F59E0B</color>
+    <color name="editor_selection">#3F3F46</color>
 
+    <!-- Syntax Highlighting -->
+    <color name="syntax_tag">#F43F5E</color>
+    <color name="syntax_attr">#FBBF24</color>
+    <color name="syntax_string">#34D399</color>
+    <color name="syntax_keyword">#A78BFA</color>
+    <color name="syntax_function">#38BDF8</color>
+    <color name="syntax_comment">#71717A</color>
+    <color name="syntax_number">#FB923C</color>
+    <color name="syntax_css_prop">#38BDF8</color>
+    <color name="syntax_css_val">#F472B6</color>
+
+    <!-- Console Terminal -->
+    <color name="console_bg">#0D0D11</color>
+    <color name="console_error">#EF4444</color>
+    <color name="console_warn">#F59E0B</color>
+    <color name="console_info">#38BDF8</color>
+    <color name="console_log">#D4D4D8</color>
+    <color name="console_badge_error_bg">#3D1418</color>
+    <color name="console_badge_warn_bg">#3E270A</color>
+    <color name="console_badge_info_bg">#0A2640</color>
+
+    <color name="nav_active_indicator">#F59E0B</color>
+    <color name="ic_launcher_background">#18181E</color>
 </resources>

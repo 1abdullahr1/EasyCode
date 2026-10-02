@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <!-- Hardware Accelerated WebView Result Screen -->
+    <WebView
+        android:id="@+id/wv_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/console_container" />
+
+    <!-- Progress Indicator for WebView Loading -->
+    <ProgressBar
+        android:id="@+id/progress_loading"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_alignParentTop="true"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+    <!-- Empty State: JSFiddle-Style Boilerplates Quick-Starter Overlay -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/layout_empty_state"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/console_container"
+        android:background="?android:attr/colorBackground"
+        android:fillViewport="true"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="32dp">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/ic_easycode_logo"
+                android:contentDescription="@string/app_name" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/boilerplates_title"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="@string/boilerplates_subtitle"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="13sp" />
+
+            <!-- Flow-like list of starter template chips -->
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group_boilerplates"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:chipSpacing="8dp"
+                app:singleLine="false">
+
+                <!-- Dynamic boilerplate chips added here programmatically -->
+
+            </com.google.android.material.chip.ChipGroup>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Collapsible Console Container (JSFiddle-style) -->
+    <LinearLayout
+        android:id="@+id/console_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/console_bg"
+        android:elevation="6dp"
+        android:orientation="vertical">
+
+        <!-- Console Header Strip -->
+        <LinearLayout
+            android:id="@+id/console_header"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/editor_gutter_bg"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_terminal"
+                app:tint="@color/editor_gutter_text"
+                android:contentDescription="@string/console_title" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="monospace"
+                android:text="@string/console_title"
+                android:textColor="@color/editor_text"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <!-- Error Counter Badge -->
+            <LinearLayout
+                android:id="@+id/badge_error_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/bg_console_badge_error"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_error"
+                    android:contentDescription="@string/console_filter_errors" />
+
+                <TextView
+                    android:id="@+id/tv_count_error"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="monospace"
+                    android:text="0"
+                    android:textColor="@color/console_error"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Warning Counter Badge -->
+            <LinearLayout
+                android:id="@+id/badge_warn_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_console_badge_warn"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_warning"
+                    android:contentDescription="@string/console_filter_warnings" />
+
+                <TextView
+                    android:id="@+id/tv_count_warn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="monospace"
+                    android:text="0"
+                    android:textColor="@color/console_warn"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Info / Log Counter Badge -->
+            <LinearLayout
+                android:id="@+id/badge_info_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_console_badge_info"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_info_circle"
+                    android:contentDescription="@string/console_filter_logs" />
+
+                <TextView
+                    android:id="@+id/tv_count_log"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="monospace"
+                    android:text="0"
+                    android:textColor="@color/console_info"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <!-- Spacer -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Clear Console Button -->
+            <ImageButton
+                android:id="@+id/btn_clear_console"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_clear"
+                app:tint="@color/editor_gutter_text"
+                android:contentDescription="@string/console_clear" />
+
+            <!-- Expand / Collapse Indicator Chevron -->
+            <ImageView
+                android:id="@+id/iv_console_chevron"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_arrow_down"
+                app:tint="@color/editor_gutter_text"
+                android:contentDescription="@string/console_title" />
+
+        </LinearLayout>
+
+        <!-- Expandable Console Log Feed -->
+        <LinearLayout
+            android:id="@+id/console_body"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="@color/console_bg"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Filter Chips Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:background="#14141B"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp">
+
+                <TextView
+                    android:id="@+id/filter_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_filter_pill_active"
+                    android:fontFamily="monospace"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:text="@string/console_filter_all"
+                    android:textColor="@color/primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/filter_errors"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_filter_pill"
+                    android:fontFamily="monospace"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:text="@string/console_filter_errors"
+                    android:textColor="@color/editor_gutter_text"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/filter_warnings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_filter_pill"
+                    android:fontFamily="monospace"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:text="@string/console_filter_warnings"
+                    android:textColor="@color/editor_gutter_text"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/filter_logs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_filter_pill"
+                    android:fontFamily="monospace"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:text="@string/console_filter_logs"
+                    android:textColor="@color/editor_gutter_text"
+                    android:textSize="11sp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_console_empty"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="@string/console_empty"
+                android:textColor="@color/editor_gutter_text"
+                android:textSize="12sp"
+                android:visibility="visible" />
+
+            <!-- Console RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_console_logs"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

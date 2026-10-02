@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="3dp"
+    android:paddingHorizontal="4dp"
+    android:gravity="top">
+
+    <TextView
+        android:id="@+id/tv_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:text="LOG"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:paddingHorizontal="4dp"
+        android:paddingVertical="1dp"
+        android:background="@drawable/bg_console_badge_info"
+        android:textColor="@color/console_info" />
+
+    <TextView
+        android:id="@+id/tv_line"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:fontFamily="monospace"
+        android:text=":12"
+        android:textSize="11sp"
+        android:textColor="@color/editor_gutter_text" />
+
+    <TextView
+        android:id="@+id/tv_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_weight="1"
+        android:fontFamily="monospace"
+        android:text="Output message"
+        android:textColor="@color/console_log"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:fontFamily="monospace"
+        android:text="10:45:01"
+        android:textSize="10sp"
+        android:textColor="@color/editor_gutter_text" />
+
+</LinearLayout>

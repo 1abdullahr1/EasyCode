@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.VULectureHub" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.EasyCode" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary Brand Colors -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/onPrimary</item>
@@ -26,8 +27,8 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
-    <style name="ThemeOverlay.VULectureHub.BottomNav" parent="">
-        <item name="colorSecondaryContainer">@color/nav_active_indicator</item>
-        <item name="colorOnSecondaryContainer">@color/primary</item>
+    <style name="ThemeOverlay.EasyCode.BottomNav" parent="">
+        <item name="colorSecondaryContainer">@color/primaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/onPrimaryContainer</item>
     </style>
 </resources>

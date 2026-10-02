@@ -1,46 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- LibreTube Rounded Card & Image Styles -->
-    <style name="RoundedImageView">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">8%</item>
-    </style>
-
-    <style name="CircleImageView">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>
-    </style>
-
-    <style name="ItemRow">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+    <style name="CodeEditorText">
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:gravity">top|start</item>
+        <item name="android:textColor">@color/editor_text</item>
+        <item name="android:textColorHighlight">@color/editor_selection</item>
+        <item name="android:background">@null</item>
         <item name="android:padding">8dp</item>
-        <item name="android:background">@drawable/rounded_ripple</item>
+        <item name="android:scrollbars">vertical|horizontal</item>
     </style>
 
-    <style name="DurationBadge">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingHorizontal">6dp</item>
-        <item name="android:paddingVertical">2dp</item>
-        <item name="android:textColor">@color/duration_text_color</item>
-        <item name="android:textSize">11sp</item>
+    <style name="CodeToolbarButton" parent="Widget.Material3.Button.TonalButton">
+        <item name="android:minWidth">38dp</item>
+        <item name="android:minHeight">38dp</item>
+        <item name="android:paddingHorizontal">8dp</item>
+        <item name="android:paddingVertical">4dp</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="cornerRadius">6dp</item>
     </style>
 
-    <style name="SectionHeader">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">18sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:paddingHorizontal">16dp</item>
-        <item name="android:paddingTop">16dp</item>
-        <item name="android:paddingBottom">8dp</item>
-    </style>
-
-    <style name="ChipStyle" parent="Widget.Material3.Chip.Filter">
+    <style name="ConsoleFilterChip" parent="Widget.Material3.Chip.Filter">
         <item name="chipCornerRadius">8dp</item>
-        <item name="android:textSize">13sp</item>
+        <item name="android:textSize">12sp</item>
     </style>
 </resources>

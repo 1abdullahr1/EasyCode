@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Format align code lines icon -->
+    <path
+        android:fillColor="?attr/colorOnSurface"
+        android:pathData="M3,17h18v-2H3v2zm0,4h12v-2H3v2zm0,-8h18v-2H3v2zm0,-8v2h18V5H3z"/>
+</vector>

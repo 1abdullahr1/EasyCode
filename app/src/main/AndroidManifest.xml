@@ -4,14 +4,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.VIEW" />
-            <data android:scheme="https" />
-        </intent>
-    </queries>
-
     <application
+        android:name=".EasyCodeApp"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:usesCleartextTraffic="true"
@@ -19,7 +13,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.VULectureHub">
+        android:theme="@style/Theme.EasyCode">
 
         <!-- Splash Screen Activity -->
         <activity
@@ -31,41 +25,23 @@
             </intent-filter>
         </activity>
 
-        <!-- Main Activity with Bottom Navigation & Persistent Player -->
+        <!-- Main Code Editor & Playground Activity -->
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustResize" />
 
-        <!-- Course Detail Activity -->
-        <activity
-            android:name=".ui.detail.CourseDetailActivity"
+        <!-- File Provider for Exporting HTML Code -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.easycode.ide.fileprovider"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- Player Activity (Orientation changes handled smoothly for fullscreen) -->
-        <activity
-            android:name=".ui.player.PlayerActivity"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
-            android:exported="false" />
-
-        <!-- Resources Activity -->
-        <activity
-            android:name=".ui.resources.ResourcesActivity"
-            android:exported="false"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- Onboarding Activity -->
-        <activity
-            android:name=".ui.onboarding.OnboardingActivity"
-            android:exported="false" />
-
-        <!-- In-App WebView Activity -->
-        <activity
-            android:name=".ui.webview.WebViewActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:exported="false" />
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

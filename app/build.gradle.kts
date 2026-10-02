@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-    namespace = "com.vu.lecturehub"
+    namespace = "com.easycode.ide"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.vu.lecturehub"
-        minSdk = 24
+        applicationId = "com.easycode.ide"
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
@@ -75,4 +75,7 @@ dependencies {
 
     // ViewPager2 for smooth hardware-accelerated tab transitions
     implementation("androidx.viewpager2:viewpager2:1.1.0")
+
+    // AndroidX WebKit for modern WebView capabilities
+    implementation("androidx.webkit:webkit:1.12.1")
 }
