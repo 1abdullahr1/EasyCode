@@ -22,4 +22,5 @@ initialData.json
 all_playlists.json
 vu_courses_playlists.json
 output_desktop/
+output_android/
 desktop/target/
