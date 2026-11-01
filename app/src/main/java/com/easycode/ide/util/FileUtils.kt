@@ -2,6 +2,7 @@ package com.easycode.ide.util
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
@@ -37,7 +38,7 @@ object FileUtils {
 
             context.startActivity(Intent.createChooser(shareIntent, "Share / Export HTML"))
         } catch (e: Exception) {
-            e.printStackTrace()
+            Toast.makeText(context, "Could not export HTML. Please try again or choose another sharing app.", Toast.LENGTH_LONG).show()
         }
     }
 }

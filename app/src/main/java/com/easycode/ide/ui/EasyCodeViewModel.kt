@@ -54,6 +54,13 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
     private val _layoutMode = MutableLiveData(LayoutMode.TABS)
     val layoutMode: LiveData<LayoutMode> = _layoutMode
 
+    private val _projectRevision = MutableLiveData(0L)
+    val projectRevision: LiveData<Long> = _projectRevision
+
+    private fun beginProject() {
+        _projectRevision.value = (_projectRevision.value ?: 0L) + 1L
+    }
+
     fun updateTitle(newTitle: String) {
         _title.value = newTitle
     }
@@ -99,6 +106,7 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun loadBoilerplate(bp: Boilerplate) {
+        beginProject()
         _title.value = bp.title
         _htmlCode.value = bp.htmlCode
         _cssCode.value = bp.cssCode
@@ -110,6 +118,7 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun newFiddle() {
+        beginProject()
         _title.value = "Untitled fiddle"
         _htmlCode.value = ""
         _cssCode.value = ""
@@ -121,6 +130,7 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun loadFiddle(fiddle: FiddleEntity) {
+        beginProject()
         _currentFiddleId.value = fiddle.id
         _title.value = fiddle.title
         _htmlCode.value = fiddle.htmlCode

@@ -66,11 +66,7 @@ class EditorFragment : Fragment() {
                 updateLineNumbers(text)
 
                 // Sync code with ViewModel
-                when (editorType) {
-                    TYPE_HTML -> viewModel.updateHtml(text)
-                    TYPE_CSS -> viewModel.updateCss(text)
-                    TYPE_JS -> viewModel.updateJs(text)
-                }
+                syncCode(text)
 
                 // Debounce syntax highlighting
                 highlightRunnable?.let { highlightHandler.removeCallbacks(it) }
@@ -92,14 +88,14 @@ class EditorFragment : Fragment() {
             val currentText = binding.etCode.text?.toString().orEmpty()
             val previous = undoRedoManager.undo(currentText)
             if (previous != null) {
-                applyTextSilently(previous)
+                applyEditorAction(previous)
             }
         }
 
         binding.btnRedo.setOnClickListener {
             val next = undoRedoManager.redo()
             if (next != null) {
-                applyTextSilently(next)
+                applyEditorAction(next)
             }
         }
 
@@ -119,6 +115,9 @@ class EditorFragment : Fragment() {
     }
 
     private fun observeViewModel() {
+        viewModel.projectRevision.observe(viewLifecycleOwner) {
+            undoRedoManager.clear()
+        }
         val liveData = when (editorType) {
             TYPE_HTML -> viewModel.htmlCode
             TYPE_CSS -> viewModel.cssCode
@@ -128,8 +127,8 @@ class EditorFragment : Fragment() {
         liveData.observe(viewLifecycleOwner) { text ->
             if (binding.etCode.text?.toString() != text) {
                 applyTextSilently(text.orEmpty())
-                undoRedoManager.recordSnapshot(text.orEmpty())
             }
+            undoRedoManager.recordSnapshot(text.orEmpty())
         }
     }
 
@@ -151,6 +150,19 @@ class EditorFragment : Fragment() {
         }
     }
 
+    private fun syncCode(text: String) {
+        when (editorType) {
+            TYPE_HTML -> viewModel.updateHtml(text)
+            TYPE_CSS -> viewModel.updateCss(text)
+            TYPE_JS -> viewModel.updateJs(text)
+        }
+    }
+
+    private fun applyEditorAction(text: String) {
+        applyTextSilently(text)
+        syncCode(text)
+    }
+
     private fun updateLineNumbers(text: String) {
         val lineCount = text.count { it == '\n' } + 1
         val sb = StringBuilder()
@@ -170,7 +182,8 @@ class EditorFragment : Fragment() {
             TYPE_JS -> simpleIndentFormat(text)
             else -> text
         }
-        applyTextSilently(formatted)
+        undoRedoManager.recordSnapshot(formatted)
+        applyEditorAction(formatted)
         Toast.makeText(requireContext(), getString(R.string.action_format), Toast.LENGTH_SHORT).show()
     }
 

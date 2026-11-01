@@ -29,8 +29,15 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew assembleDebug --stacktrace
+      - name: Test and build with Gradle
+        run: ./gradlew testDebugUnitTest assembleDebug --stacktrace
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: easycode-test-reports
+          path: app/build/reports/tests/
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
