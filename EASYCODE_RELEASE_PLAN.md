@@ -1,7 +1,7 @@
 # EasyCode: completion and Google Play release plan
 
 Created: 1 November 2026  
-Status: Implementation in progress; initial correctness fixes prepared for cloud validation.  
+Status: Implementation in progress; initial correctness fixes passed cloud tests and debug build.  
 Product reference: JSFiddle. Platform: Android. Scope: EasyCode in `app/`.
 
 ## 1. Product goal
@@ -217,7 +217,8 @@ Version 1.0 is complete when the agreed scope works, all release gates pass, the
 - Recorded dependencies: AGP 8.7.3, Kotlin 2.0.21, KSP 2.0.21-1.0.28; compile/target API 35, minimum API 26.
 - Initial changes: Undo/Redo/Format synchronize shared code; formatting enters undo history; new/load/template actions reset editor history; provider authority follows application ID; export failures produce visible feedback.
 - Added JVM regression tests for history boundaries and compiler composition/resource handling. CI now runs tests before producing the debug APK and uploads reports.
-- Validation still required: cloud tests/build, physical-device editor and export checks, signed release provider verification. Draft persistence, replacement prompts and the remaining milestones are unfinished.
+- Cloud validation: commit `e9f7f19` passed tests and debug APK compilation at https://github.com/1abdullahr1/EasyCode/actions/runs/41285253843. Artifacts downloaded to `output_android/e9f7f19/`.
+- Validation still required: physical-device editor and export checks, signed release provider verification. Draft persistence, replacement prompts and the remaining milestones are unfinished.
 
 ### Decisions to settle during M0
 
