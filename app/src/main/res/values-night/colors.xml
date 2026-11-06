@@ -1,4 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="nav_active_indicator">#00458E</color>
+    <color name="primary">#F59E0B</color>
+    <color name="onPrimary">#18181B</color>
+    <color name="background">#121216</color>
+    <color name="editor_background">#18181E</color>
+    <color name="editor_cursor">#FBBF24</color>
+    <color name="editor_gutter_bg">#131317</color>
+    <color name="editor_gutter_text">#AEB3C0</color>
+    <color name="editor_selection">#4F452F</color>
+    <color name="editor_text">#F4F4F5</color>
+    <color name="onBackground">#F4F4F5</color>
+    <color name="onSurface">#F4F4F5</color>
+    <color name="onSurfaceVariant">#B6B6C0</color>
+    <color name="outline">#747481</color>
+    <color name="surface">#18181E</color>
+    <color name="surfaceVariant">#24242E</color>
+    <color name="syntax_attr">#FBBF24</color>
+    <color name="syntax_comment">#A6AAB5</color>
+    <color name="syntax_css_prop">#70D5FF</color>
+    <color name="syntax_css_val">#F9A8D4</color>
+    <color name="syntax_function">#70D5FF</color>
+    <color name="syntax_keyword">#C0ABFF</color>
+    <color name="syntax_number">#FDBA74</color>
+    <color name="syntax_string">#6EE7B7</color>
+    <color name="syntax_tag">#FF829A</color>
 </resources>

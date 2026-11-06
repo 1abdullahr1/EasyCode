@@ -1,6 +1,7 @@
 package com.easycode.ide.ui.editor
 
-import android.graphics.Color
+import android.content.res.Resources
+import com.easycode.ide.R
 import android.text.Spannable
 import android.text.style.ForegroundColorSpan
 import java.util.regex.Pattern
@@ -29,48 +30,36 @@ object SyntaxHighlighter {
     private val PATTERN_JS_BLOCK_COMMENT = Pattern.compile("/\\*[\\s\\S]*?\\*/")
     private val PATTERN_JS_FUNCTION = Pattern.compile("\\b([a-zA-Z0-9_$]+)(?=\\s*\\()")
 
-    // Syntax Color Scheme
-    private val COLOR_TAG = Color.parseColor("#F43F5E")      // Rose
-    private val COLOR_ATTR = Color.parseColor("#FBBF24")     // Amber
-    private val COLOR_STRING = Color.parseColor("#34D399")   // Emerald
-    private val COLOR_KEYWORD = Color.parseColor("#A78BFA")  // Purple
-    private val COLOR_FUNCTION = Color.parseColor("#38BDF8") // Sky Blue
-    private val COLOR_COMMENT = Color.parseColor("#71717A")  // Zinc-500
-    private val COLOR_NUMBER = Color.parseColor("#FB923C")   // Orange
-    private val COLOR_CSS_PROP = Color.parseColor("#38BDF8") // Sky Blue
-    private val COLOR_CSS_VAL = Color.parseColor("#F472B6")  // Pink
-    private val COLOR_SELECTOR = Color.parseColor("#FBBF24") // Amber
-
-    fun highlightHtml(spannable: Spannable) {
+    fun highlightHtml(spannable: Spannable, resources: Resources) {
         clearSpans(spannable)
         val text = spannable.toString()
 
-        applyPattern(spannable, text, PATTERN_HTML_TAG, COLOR_TAG)
-        applyPattern(spannable, text, PATTERN_HTML_ATTR, COLOR_ATTR)
-        applyPattern(spannable, text, PATTERN_HTML_STRING, COLOR_STRING)
-        applyPattern(spannable, text, PATTERN_HTML_COMMENT, COLOR_COMMENT)
+        applyPattern(spannable, text, PATTERN_HTML_TAG, resources.getColor(R.color.syntax_tag, null))
+        applyPattern(spannable, text, PATTERN_HTML_ATTR, resources.getColor(R.color.syntax_attr, null))
+        applyPattern(spannable, text, PATTERN_HTML_STRING, resources.getColor(R.color.syntax_string, null))
+        applyPattern(spannable, text, PATTERN_HTML_COMMENT, resources.getColor(R.color.syntax_comment, null))
     }
 
-    fun highlightCss(spannable: Spannable) {
+    fun highlightCss(spannable: Spannable, resources: Resources) {
         clearSpans(spannable)
         val text = spannable.toString()
 
-        applyPattern(spannable, text, PATTERN_CSS_SELECTOR, COLOR_SELECTOR)
-        applyPattern(spannable, text, PATTERN_CSS_PROP, COLOR_CSS_PROP)
-        applyPattern(spannable, text, PATTERN_CSS_VAL, COLOR_CSS_VAL)
-        applyPattern(spannable, text, PATTERN_CSS_COMMENT, COLOR_COMMENT)
+        applyPattern(spannable, text, PATTERN_CSS_SELECTOR, resources.getColor(R.color.syntax_attr, null))
+        applyPattern(spannable, text, PATTERN_CSS_PROP, resources.getColor(R.color.syntax_css_prop, null))
+        applyPattern(spannable, text, PATTERN_CSS_VAL, resources.getColor(R.color.syntax_css_val, null))
+        applyPattern(spannable, text, PATTERN_CSS_COMMENT, resources.getColor(R.color.syntax_comment, null))
     }
 
-    fun highlightJs(spannable: Spannable) {
+    fun highlightJs(spannable: Spannable, resources: Resources) {
         clearSpans(spannable)
         val text = spannable.toString()
 
-        applyPattern(spannable, text, PATTERN_JS_KEYWORDS, COLOR_KEYWORD)
-        applyPattern(spannable, text, PATTERN_JS_FUNCTION, COLOR_FUNCTION)
-        applyPattern(spannable, text, PATTERN_JS_NUMBER, COLOR_NUMBER)
-        applyPattern(spannable, text, PATTERN_JS_STRING, COLOR_STRING)
-        applyPattern(spannable, text, PATTERN_JS_LINE_COMMENT, COLOR_COMMENT)
-        applyPattern(spannable, text, PATTERN_JS_BLOCK_COMMENT, COLOR_COMMENT)
+        applyPattern(spannable, text, PATTERN_JS_KEYWORDS, resources.getColor(R.color.syntax_keyword, null))
+        applyPattern(spannable, text, PATTERN_JS_FUNCTION, resources.getColor(R.color.syntax_function, null))
+        applyPattern(spannable, text, PATTERN_JS_NUMBER, resources.getColor(R.color.syntax_number, null))
+        applyPattern(spannable, text, PATTERN_JS_STRING, resources.getColor(R.color.syntax_string, null))
+        applyPattern(spannable, text, PATTERN_JS_LINE_COMMENT, resources.getColor(R.color.syntax_comment, null))
+        applyPattern(spannable, text, PATTERN_JS_BLOCK_COMMENT, resources.getColor(R.color.syntax_comment, null))
     }
 
     private fun clearSpans(spannable: Spannable) {

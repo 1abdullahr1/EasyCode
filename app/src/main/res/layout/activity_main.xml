@@ -145,7 +145,7 @@
                 android:layout_height="70dp"
                 android:background="?attr/colorSurface"
                 android:theme="@style/ThemeOverlay.EasyCode.BottomNav"
-                app:elevation="8dp"
+                app:elevation="0dp"
                 app:itemIconTint="@color/nav_item_tint"
                 app:itemTextColor="@color/nav_item_tint"
                 app:labelVisibilityMode="labeled"

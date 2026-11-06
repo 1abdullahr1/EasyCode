@@ -8,6 +8,7 @@
     <!-- Scrollable Code Workspace -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/editor_scroll"
+        android:layout_below="@+id/editor_actions"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -54,27 +55,29 @@
                 android:textColor="@color/editor_text"
                 android:textColorHighlight="@color/editor_selection"
                 android:textColorHint="@color/editor_gutter_text"
+                android:textCursorDrawable="@drawable/editor_caret"
                 android:textSize="13sp" />
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Mini Floating Quick Actions: Undo, Redo, Format, Copy -->
+    <!-- Editor actions sit above the first line of code. -->
     <LinearLayout
+        android:id="@id/editor_actions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_margin="12dp"
+        android:layout_margin="4dp"
         android:background="@drawable/bg_editor_container"
         android:orientation="horizontal"
         android:padding="2dp">
 
         <ImageButton
             android:id="@+id/btn_undo"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_undo"
             app:tint="@color/editor_gutter_text"
@@ -82,8 +85,8 @@
 
         <ImageButton
             android:id="@+id/btn_redo"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_redo"
             app:tint="@color/editor_gutter_text"
@@ -91,8 +94,8 @@
 
         <ImageButton
             android:id="@+id/btn_format"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_format"
             app:tint="@color/editor_gutter_text"
@@ -100,12 +103,21 @@
 
         <ImageButton
             android:id="@+id/btn_copy"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_copy"
             app:tint="@color/editor_gutter_text"
-            android:contentDescription="@string/copied_to_clipboard" />
+            android:contentDescription="Copy code" />
+
+        <ImageButton
+            android:id="@+id/btn_clear_tab"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_clear"
+            app:tint="@color/editor_gutter_text"
+            android:contentDescription="Clear editor" />
 
     </LinearLayout>
 

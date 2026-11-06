@@ -39,6 +39,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/action_files"
+        android:title="Files"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_export_html"
         android:icon="@drawable/ic_share"
         android:title="@string/action_export_html"

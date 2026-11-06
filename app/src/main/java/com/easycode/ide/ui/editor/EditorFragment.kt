@@ -3,6 +3,7 @@ package com.easycode.ide.ui.editor
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -17,6 +18,8 @@ import androidx.fragment.app.activityViewModels
 import com.easycode.ide.R
 import com.easycode.ide.databinding.FragmentEditorBinding
 import com.easycode.ide.ui.EasyCodeViewModel
+import com.easycode.ide.util.EditorPreferences
+import com.google.android.material.snackbar.Snackbar
 
 class EditorFragment : Fragment() {
 
@@ -24,7 +27,8 @@ class EditorFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: EasyCodeViewModel by activityViewModels()
-    private val undoRedoManager = UndoRedoManager()
+    private val undoRedoManager get() = viewModel.editorHistory.getOrPut(editorType) { UndoRedoManager() }
+    private val preferenceListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ -> applyPreferences() }
     private val highlightHandler = Handler(Looper.getMainLooper())
     private var highlightRunnable: Runnable? = null
 
@@ -50,9 +54,12 @@ class EditorFragment : Fragment() {
         setupEditor()
         setupActions()
         observeViewModel()
+        EditorPreferences.store(requireContext()).registerOnSharedPreferenceChangeListener(preferenceListener)
+        applyPreferences()
     }
 
     private fun setupEditor() {
+        binding.etCode.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateLineNumbers() }
         binding.etCode.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -63,7 +70,7 @@ class EditorFragment : Fragment() {
 
                 val text = s.toString()
                 undoRedoManager.recordSnapshot(text)
-                updateLineNumbers(text)
+                binding.etCode.post { updateLineNumbers() }
 
                 // Sync code with ViewModel
                 syncCode(text)
@@ -73,9 +80,9 @@ class EditorFragment : Fragment() {
                 highlightRunnable = Runnable {
                     val currentEditable = binding.etCode.text ?: return@Runnable
                     when (editorType) {
-                        TYPE_HTML -> SyntaxHighlighter.highlightHtml(currentEditable)
-                        TYPE_CSS -> SyntaxHighlighter.highlightCss(currentEditable)
-                        TYPE_JS -> SyntaxHighlighter.highlightJs(currentEditable)
+                        TYPE_HTML -> SyntaxHighlighter.highlightHtml(currentEditable, resources)
+                        TYPE_CSS -> SyntaxHighlighter.highlightCss(currentEditable, resources)
+                        TYPE_JS -> SyntaxHighlighter.highlightJs(currentEditable, resources)
                     }
                 }
                 highlightHandler.postDelayed(highlightRunnable!!, 250)
@@ -103,6 +110,23 @@ class EditorFragment : Fragment() {
             formatCode()
         }
 
+        val language = if (editorType == TYPE_JS) "JavaScript" else editorType
+        binding.btnClearTab.contentDescription = "Clear $language"
+        binding.btnClearTab.setOnClickListener {
+            val original = viewModel.code(editorType)
+            if (original.isEmpty()) return@setOnClickListener
+            val revision = viewModel.projectRevision.value
+            undoRedoManager.recordSnapshot(original)
+            undoRedoManager.recordSnapshot("")
+            applyEditorAction("")
+            Snackbar.make(binding.root, "$language cleared", Snackbar.LENGTH_LONG)
+                .setAction("Undo") {
+                    if (revision == viewModel.projectRevision.value && viewModel.code(editorType).isEmpty()) {
+                        undoRedoManager.undo("")?.let { viewModel.replaceCode(editorType, it) }
+                    }
+                }.show()
+        }
+
         binding.btnCopy.setOnClickListener {
             val text = binding.etCode.text?.toString().orEmpty()
             if (text.isNotEmpty()) {
@@ -115,9 +139,6 @@ class EditorFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.projectRevision.observe(viewLifecycleOwner) {
-            undoRedoManager.clear()
-        }
         val liveData = when (editorType) {
             TYPE_HTML -> viewModel.htmlCode
             TYPE_CSS -> viewModel.cssCode
@@ -136,16 +157,16 @@ class EditorFragment : Fragment() {
         isUpdatingFromViewModel = true
         binding.etCode.setText(text)
         binding.etCode.setSelection(binding.etCode.length())
-        updateLineNumbers(text)
+        binding.etCode.post { updateLineNumbers() }
         isUpdatingFromViewModel = false
 
         // Highlight immediately
         val editable = binding.etCode.text
         if (editable != null) {
             when (editorType) {
-                TYPE_HTML -> SyntaxHighlighter.highlightHtml(editable)
-                TYPE_CSS -> SyntaxHighlighter.highlightCss(editable)
-                TYPE_JS -> SyntaxHighlighter.highlightJs(editable)
+                TYPE_HTML -> SyntaxHighlighter.highlightHtml(editable, resources)
+                TYPE_CSS -> SyntaxHighlighter.highlightCss(editable, resources)
+                TYPE_JS -> SyntaxHighlighter.highlightJs(editable, resources)
             }
         }
     }
@@ -163,13 +184,31 @@ class EditorFragment : Fragment() {
         syncCode(text)
     }
 
-    private fun updateLineNumbers(text: String) {
-        val lineCount = text.count { it == '\n' } + 1
-        val sb = StringBuilder()
-        for (i in 1..lineCount) {
-            sb.append(i).append("\n")
+    private fun applyPreferences() {
+        val editor = _binding ?: return
+        val prefs = EditorPreferences.store(requireContext())
+        val font = prefs.getInt(EditorPreferences.FONT, EditorPreferences.DEFAULT_FONT).toFloat()
+        editor.etCode.textSize = font
+        editor.tvLineNumbers.textSize = font
+        editor.etCode.setHorizontallyScrolling(!prefs.getBoolean(EditorPreferences.WRAP, true))
+        editor.tvLineNumbers.visibility = if (prefs.getBoolean(EditorPreferences.NUMBERS, true)) View.VISIBLE else View.GONE
+        editor.etCode.post { updateLineNumbers() }
+    }
+
+    private fun updateLineNumbers() {
+        val editor = _binding ?: return
+        if (editor.tvLineNumbers.visibility != View.VISIBLE) return
+        val layout = editor.etCode.layout ?: return
+        val text = editor.etCode.text
+        var number = 0
+        val numbers = buildString {
+            for (line in 0 until layout.lineCount) {
+                if (line > 0) append('\n')
+                val start = layout.getLineStart(line)
+                if (start == 0 || text.getOrNull(start - 1) == '\n') append(++number)
+            }
         }
-        binding.tvLineNumbers.text = sb.toString().trimEnd()
+        if (editor.tvLineNumbers.text.toString() != numbers) editor.tvLineNumbers.text = numbers
     }
 
     private fun formatCode() {
@@ -188,6 +227,7 @@ class EditorFragment : Fragment() {
     }
 
     private fun simpleIndentFormat(input: String): String {
+        val indent = " ".repeat(EditorPreferences.indent(requireContext()))
         val lines = input.lines()
         val result = StringBuilder()
         var indentLevel = 0
@@ -204,7 +244,7 @@ class EditorFragment : Fragment() {
                 indentLevel = maxOf(0, indentLevel - 1)
             }
 
-            result.append("  ".repeat(indentLevel)).append(line).append("\n")
+            result.append(indent.repeat(indentLevel)).append(line).append("\n")
 
             // Increase indent if line opens a block
             if (line.endsWith("{") || (line.startsWith("<") && !line.startsWith("</") && !line.endsWith("/>") && !line.contains("</")) || line.endsWith("[")) {
@@ -221,14 +261,16 @@ class EditorFragment : Fragment() {
         val text = binding.etCode.text ?: return
 
         if (start >= 0) {
-            text.replace(minOf(start, end), maxOf(start, end), insertion)
-            binding.etCode.setSelection(start + insertion.length)
+            val insertionStart = if (end >= 0) minOf(start, end) else start
+            text.replace(insertionStart, maxOf(start, end), insertion)
+            binding.etCode.setSelection(insertionStart + insertion.length)
         } else {
             text.append(insertion)
         }
     }
 
     override fun onDestroyView() {
+        EditorPreferences.store(requireContext()).unregisterOnSharedPreferenceChangeListener(preferenceListener)
         highlightRunnable?.let { highlightHandler.removeCallbacks(it) }
         _binding = null
         super.onDestroyView()

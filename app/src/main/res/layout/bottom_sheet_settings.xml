@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/colorSurface"
+    android:background="?attr/colorSurface">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingBottom="32dp">
 
@@ -84,7 +88,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:paddingHorizontal="20dp"
-        app:singleSelection="true">
+        app:singleSelection="true"
+        app:selectionRequired="true">
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip_font_12"
@@ -117,7 +122,6 @@
 
     </com.google.android.material.chip.ChipGroup>
 
-    <!-- Switches: Word Wrap & Auto Run -->
     <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/switch_word_wrap"
         android:layout_width="match_parent"
@@ -129,13 +133,61 @@
         android:textColor="?attr/colorOnSurface" />
 
     <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/switch_auto_run"
+        android:id="@+id/switch_line_numbers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:paddingHorizontal="20dp"
         android:checked="false"
-        android:text="@string/settings_auto_run"
+        android:text="Line numbers"
         android:textColor="?attr/colorOnSurface" />
 
+    <TextView
+        android:id="@+id/indent_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="Indentation width"
+        android:labelFor="@+id/indent_width"
+        android:textColor="?attr/colorOnSurface" />
+
+    <Spinner
+        android:id="@id/indent_width"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="20dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/reset_editor"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="20dp"
+        android:text="Reset editor settings" />
+
+    <TextView
+        android:id="@+id/selected_folder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="12dp"
+        android:textColor="?attr/colorOnSurface" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/change_folder"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="20dp"
+        android:text="Choose folder" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/disconnect_folder"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="20dp"
+        android:text="Disconnect folder" />
+
 </LinearLayout>
+</ScrollView>

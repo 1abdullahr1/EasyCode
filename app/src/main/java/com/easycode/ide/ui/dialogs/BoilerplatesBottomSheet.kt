@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.easycode.ide.MainActivity
 import com.easycode.ide.data.repository.BoilerplateRepository
 import com.easycode.ide.databinding.BottomSheetBoilerplatesBinding
 import com.easycode.ide.ui.EasyCodeViewModel
@@ -35,8 +36,10 @@ class BoilerplatesBottomSheet : BottomSheetDialogFragment() {
             layoutManager = LinearLayoutManager(requireContext())
             setHasFixedSize(true)
             adapter = BoilerplateCardAdapter(BoilerplateRepository.boilerplates) { bp ->
-                viewModel.loadBoilerplate(bp)
-                dismiss()
+                (activity as? MainActivity)?.confirmProjectChange {
+                    viewModel.loadBoilerplate(bp)
+                    dismissAllowingStateLoss()
+                }
             }
         }
     }

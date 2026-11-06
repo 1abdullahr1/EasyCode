@@ -1,6 +1,8 @@
 package com.easycode.ide
 
 import android.os.Bundle
+import android.text.InputFilter
+import androidx.core.widget.doAfterTextChanged
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
@@ -10,6 +12,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.easycode.ide.data.model.FiddleEntity
@@ -25,6 +30,8 @@ import com.easycode.ide.ui.dialogs.SettingsBottomSheet
 import com.easycode.ide.ui.editor.EditorFragment
 import com.easycode.ide.ui.result.ResultFragment
 import com.easycode.ide.util.FileUtils
+import com.easycode.ide.util.EditorPreferences
+import com.easycode.ide.util.WorkspaceFiles
 import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
@@ -34,11 +41,20 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var pagerAdapter: MainPagerAdapter
     private lateinit var savedFiddleAdapter: SavedFiddleAdapter
+    private lateinit var workspace: WorkspaceFiles
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val safe = insets.getInsets(WindowInsetsCompat.Type.systemBars() or
+                WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime())
+            view.setPadding(safe.left, safe.top, safe.right, safe.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
+        workspace = WorkspaceFiles(this, viewModel, ::activeEditorType, ::selectEditor, ::exportProjectHtml)
 
         setupToolbar()
         setupViewPagerAndTabs()
@@ -120,8 +136,9 @@ class MainActivity : AppCompatActivity() {
         binding.keyboardAccessoryContainer.removeAllViews()
 
         for (sym in symbols) {
-            val btn = Button(this, null, 0, com.google.android.material.R.style.Widget_Material3_Button_TonalButton).apply {
+            val btn = Button(this, null, android.R.attr.borderlessButtonStyle).apply {
                 text = sym
+                setTextColor(getColor(R.color.editor_text))
                 minWidth = 0
                 minimumWidth = 0
                 setPadding(dpToPx(12), dpToPx(4), dpToPx(12), dpToPx(4))
@@ -136,7 +153,7 @@ class MainActivity : AppCompatActivity() {
                 layoutParams = lp
 
                 setOnClickListener {
-                    val insertion = if (sym == "Tab") "  " else sym
+                    val insertion = if (sym == "Tab") " ".repeat(EditorPreferences.indent(this@MainActivity)) else sym
                     insertIntoActiveEditor(insertion)
                 }
             }
@@ -146,8 +163,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun insertIntoActiveEditor(text: String) {
         val currentPosition = binding.viewPager.currentItem
+        if (viewModel.layoutMode.value == LayoutMode.SPLIT) {
+            (supportFragmentManager.findFragmentById(R.id.split_editor_container) as? EditorFragment)?.insertTextAtCursor(text)
+            return
+        }
         if (currentPosition in 0..2) {
-            val fragment = pagerAdapter.getFragmentAt(currentPosition)
+            val fragment = supportFragmentManager.findFragmentByTag("f${pagerAdapter.getItemId(currentPosition)}")
+                ?: pagerAdapter.getFragmentAt(currentPosition)
             if (fragment is EditorFragment) {
                 fragment.insertTextAtCursor(text)
             }
@@ -157,9 +179,13 @@ class MainActivity : AppCompatActivity() {
     private fun setupDrawer() {
         savedFiddleAdapter = SavedFiddleAdapter(
             onFiddleClick = { fiddle ->
-                viewModel.loadFiddle(fiddle)
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
-                Toast.makeText(this, "Loaded ${fiddle.title}", Toast.LENGTH_SHORT).show()
+                if (viewModel.currentFiddleId.value != fiddle.id) {
+                    confirmProjectChange {
+                        viewModel.loadFiddle(fiddle)
+                        Toast.makeText(this, "Loaded ${fiddle.title}", Toast.LENGTH_SHORT).show()
+                    }
+                }
             },
             onDeleteClick = { fiddle ->
                 confirmDeleteFiddle(fiddle)
@@ -173,10 +199,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnDrawerNewFiddle.setOnClickListener {
-            viewModel.newFiddle()
-            binding.viewPager.currentItem = MainPagerAdapter.TAB_HTML
             binding.drawerLayout.closeDrawer(GravityCompat.START)
-            Toast.makeText(this, "New fiddle started", Toast.LENGTH_SHORT).show()
+            showNewFiddleDialog()
         }
 
         binding.btnDrawerBoilerplates.setOnClickListener {
@@ -244,7 +268,7 @@ class MainActivity : AppCompatActivity() {
                 true
             }
             R.id.action_save -> {
-                viewModel.saveCurrentFiddle {
+                viewModel.saveCurrentFiddle(::showSaveError) {
                     Toast.makeText(this, getString(R.string.saved_success), Toast.LENGTH_SHORT).show()
                 }
                 true
@@ -265,6 +289,10 @@ class MainActivity : AppCompatActivity() {
                 exportProjectHtml()
                 true
             }
+            R.id.action_files -> {
+                workspace.showMenu()
+                true
+            }
             R.id.action_clear -> {
                 confirmClearCode()
                 true
@@ -275,6 +303,80 @@ class MainActivity : AppCompatActivity() {
             }
             else -> false
         }
+    }
+
+    fun pickWorkspaceFolder() = workspace.pickFolder()
+
+    fun disconnectWorkspaceFolder() = workspace.disconnectFolder()
+
+    private fun activeEditorType(): String? = when (binding.viewPager.currentItem) {
+        MainPagerAdapter.TAB_HTML -> EditorFragment.TYPE_HTML
+        MainPagerAdapter.TAB_CSS -> EditorFragment.TYPE_CSS
+        MainPagerAdapter.TAB_JS -> EditorFragment.TYPE_JS
+        else -> if (viewModel.layoutMode.value == LayoutMode.SPLIT) EditorFragment.TYPE_HTML else null
+    }
+
+    private fun selectEditor(type: String) {
+        binding.viewPager.setCurrentItem(when (type) {
+            EditorFragment.TYPE_CSS -> MainPagerAdapter.TAB_CSS
+            EditorFragment.TYPE_JS -> MainPagerAdapter.TAB_JS
+            else -> MainPagerAdapter.TAB_HTML
+        }, false)
+        if (viewModel.layoutMode.value == LayoutMode.SPLIT) updateLayoutMode(LayoutMode.SPLIT)
+    }
+
+    private fun showSaveError() {
+        if (!isDestroyed) Toast.makeText(this, "Could not save. Your editor contents are still available.", Toast.LENGTH_LONG).show()
+    }
+
+    fun confirmProjectChange(change: () -> Unit) {
+        if (viewModel.isSaving) {
+            Toast.makeText(this, "Wait for the current save to finish", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!viewModel.hasUnsavedChanges()) {
+            change()
+            return
+        }
+        AlertDialog.Builder(this).setTitle("Save your current fiddle?")
+            .setMessage("Save your edits before switching, or discard them.")
+            .setPositiveButton("Save and continue") { _, _ ->
+                viewModel.saveCurrentFiddle(::showSaveError) {
+                    if (!isDestroyed && !viewModel.hasUnsavedChanges()) change()
+                }
+            }
+            .setNeutralButton("Discard edits") { _, _ -> change() }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showNewFiddleDialog() {
+        val input = EditText(this).apply {
+            hint = "Fiddle name"
+            setSingleLine(true)
+            filters = arrayOf(InputFilter.LengthFilter(80))
+        }
+        val dialog = AlertDialog.Builder(this).setTitle("New fiddle")
+            .setView(input)
+            .setPositiveButton("Create") { _, _ ->
+                val name = input.text.toString().trim()
+                if (name.isNotEmpty()) confirmProjectChange {
+                    viewModel.createNamedFiddle(name, ::showSaveError) { opened ->
+                        if (!isDestroyed && opened) selectEditor(EditorFragment.TYPE_HTML)
+                        if (!isDestroyed && !opened) {
+                            Toast.makeText(this, "Fiddle created. Your current edits are still open.", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .create()
+        dialog.setOnShowListener {
+            val create = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            create.isEnabled = false
+            input.doAfterTextChanged { create.isEnabled = !it.isNullOrBlank() }
+        }
+        dialog.show()
     }
 
     private fun exportProjectHtml() {

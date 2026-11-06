@@ -10,6 +10,8 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.WebResourceRequest
+import com.easycode.ide.MainActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -58,7 +60,9 @@ class ResultFragment : Fragment() {
         settings.javaScriptEnabled = true
         settings.domStorageEnabled = true
         settings.databaseEnabled = true
-        settings.allowFileAccess = true
+        settings.allowFileAccess = false
+        settings.allowContentAccess = false
+        settings.mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
         settings.useWideViewPort = true
         settings.loadWithOverviewMode = true
         settings.cacheMode = WebSettings.LOAD_NO_CACHE
@@ -71,6 +75,10 @@ class ResultFragment : Fragment() {
         )
 
         binding.wvResult.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                return request.url.scheme != "https" || request.url.host != "localhost"
+            }
+
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
                 _binding?.progressLoading?.visibility = View.VISIBLE
@@ -160,8 +168,9 @@ class ResultFragment : Fragment() {
                 setChipBackgroundColorResource(R.color.surfaceVariant)
                 setTextColor(resources.getColor(R.color.onSurface, null))
                 setOnClickListener {
-                    viewModel.loadBoilerplate(bp)
-                    runCode()
+                    (activity as? MainActivity)?.confirmProjectChange {
+                        viewModel.loadBoilerplate(bp)
+                    }
                 }
             }
             binding.chipGroupBoilerplates.addView(chip)
@@ -209,6 +218,9 @@ class ResultFragment : Fragment() {
 
     override fun onDestroyView() {
         binding.wvResult.stopLoading()
+        binding.wvResult.removeJavascriptInterface("EasyCodeBridge")
+        (binding.wvResult.parent as? ViewGroup)?.removeView(binding.wvResult)
+        binding.wvResult.destroy()
         _binding = null
         super.onDestroyView()
     }

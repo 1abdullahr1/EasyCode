@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Brand / Primary Accent (JSFiddle Amber/Orange) -->
-    <color name="primary">#F59E0B</color>
+    <color name="primary">#9A4B00</color>
     <color name="onPrimary">#FFFFFF</color>
     <color name="primaryContainer">#FEF3C7</color>
     <color name="onPrimaryContainer">#78350F</color>
@@ -39,23 +39,23 @@
     <color name="dark_outline">#3F3F46</color>
 
     <!-- Code Editor Specific Colors -->
-    <color name="editor_background">#18181E</color>
-    <color name="editor_text">#F4F4F5</color>
-    <color name="editor_gutter_bg">#131317</color>
-    <color name="editor_gutter_text">#71717A</color>
-    <color name="editor_cursor">#F59E0B</color>
-    <color name="editor_selection">#3F3F46</color>
+    <color name="editor_background">#FFFFFF</color>
+    <color name="editor_text">#172033</color>
+    <color name="editor_gutter_bg">#F1F5F9</color>
+    <color name="editor_gutter_text">#526075</color>
+    <color name="editor_cursor">#9A4B00</color>
+    <color name="editor_selection">#FDE6B9</color>
 
     <!-- Syntax Highlighting -->
-    <color name="syntax_tag">#F43F5E</color>
-    <color name="syntax_attr">#FBBF24</color>
-    <color name="syntax_string">#34D399</color>
-    <color name="syntax_keyword">#A78BFA</color>
-    <color name="syntax_function">#38BDF8</color>
-    <color name="syntax_comment">#71717A</color>
-    <color name="syntax_number">#FB923C</color>
-    <color name="syntax_css_prop">#38BDF8</color>
-    <color name="syntax_css_val">#F472B6</color>
+    <color name="syntax_tag">#A32348</color>
+    <color name="syntax_attr">#7A4800</color>
+    <color name="syntax_string">#086344</color>
+    <color name="syntax_keyword">#6232A1</color>
+    <color name="syntax_function">#075B89</color>
+    <color name="syntax_comment">#545D6C</color>
+    <color name="syntax_number">#914009</color>
+    <color name="syntax_css_prop">#075B89</color>
+    <color name="syntax_css_val">#8D2458</color>
 
     <!-- Console Terminal -->
     <color name="console_bg">#0D0D11</color>

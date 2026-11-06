@@ -4,6 +4,48 @@ Created: 1 November 2026
 Status: Implementation in progress; initial correctness fixes passed cloud tests and debug build.  
 Product reference: JSFiddle. Platform: Android. Scope: EasyCode in `app/`.
 
+## Next implementation batch — phone review feedback, 6 November 2026
+
+The phone screenshots show two theme defects. Light mode changes the app chrome while the editor remains dark. In Dark mode, the bottom bar has a brown tint and the inactive labels and icons are hard to read. The source has a shared dark editor background and a bottom navigation selector that uses the outline color for inactive content. New Fiddle also opens an unnamed editor immediately, and the existing file export shares compiled HTML only.
+
+### 1. Fix Light, Dark, and System themes
+
+- Define paired light and dark colors for the editor canvas, text, line-number gutter, selection, caret, syntax highlighting, editor controls, and symbol keys. Light mode gets a light writing area and readable dark code. Dark mode gets a dark writing area and readable light code.
+- Match the bottom bar to the app's surface palette and use a readable text color for inactive icons and labels. Use the accent to identify the active tab, alongside an indicator. Check text, icons, and controls against their actual backgrounds in both modes.
+- Apply the selected theme to the toolbar, editor, drawer, settings, and system bars. Preserve the current fiddle, draft, and selected tab when switching. Keep the user's own HTML and CSS in control of the rendered Result.
+
+### 2. Name new fiddles and clear individual editor tabs
+
+- **New Fiddle** opens a name dialog first. Trim the title, require a non-empty name, and enable **Create** once it is valid. **Cancel** leaves the current fiddle open. When creating, protect unsaved work before switching and persist the new fiddle with its chosen name.
+- Add **Clear HTML**, **Clear CSS**, or **Clear JavaScript** to the active editor's controls. One tap clears only that editor and offers **Undo**. Record the clear as an undoable edit and preserve its history when switching tabs. Keep project-wide clearing as a separate action with confirmation.
+
+### 3. Add a Files menu
+
+Use Android's system file and folder pickers with the Storage Access Framework. Keep fiddles and drafts in the existing local library. A selected folder serves as a place to browse, open, and create source files. [Android document and folder access](https://developer.android.com/training/data-storage/shared/documents-files)
+
+| Action | Behavior |
+| --- | --- |
+| **Choose folder** | Grant access to one user-selected folder. Remember access when the provider allows it, and let the user change or disconnect it. |
+| **Open file** | Pick an HTML, CSS, or JavaScript file and open it in the matching editor. Confirm before replacing existing code. Use a text import limit and report unreadable or unsupported files without changing the current fiddle. |
+| **New file / Save as** | Choose the type and name, then create a blank file or save the active tab's code in the chosen folder or through Android's save picker. Treat filename collisions explicitly. |
+| **Save changes to file** | Write back only when the user explicitly chooses the action and the file is still writable. Warn if the file changed externally when detectable. Keep the draft on a failed write and offer **Save as**. |
+| **Share** | Offer **Share this file** for the active source tab and **Share runnable HTML** for the whole fiddle. Use the Android share sheet with a scoped, temporary read grant. |
+
+The first pass keeps the three-panel HTML/CSS/JavaScript model. File access belongs to the native file actions. Imported code running in Result must have no access to the selected folder, local files, or file-picker grants.
+
+### 4. Make Settings useful
+
+- **Appearance** has System, Light, and Dark with a clear selected state.
+- **Editor** has text size, word wrap, line numbers, and indentation width. Apply each control to all three editor tabs, retain it after restart, and provide **Reset editor settings**.
+- **Files** shows the selected folder and offers **Change folder** and **Disconnect**. Add controls only when their behavior is implemented and verified.
+
+### 5. Verify and deliver a review APK
+
+- Check both themes and System switching on a phone, including inactive bottom tabs, syntax colors, settings, symbol keys, and draft preservation.
+- Verify Clear and Undo independently in all three editors. Verify naming, cancellation, and the transition from an unsaved fiddle.
+- Exercise file open, create, save, and share on the system picker. Cover cancellation, filename conflicts, read-only folders, revoked access, and reopening after restart.
+- Run all automated Android checks and APK builds on **GitHub Actions**, then provide the review APK for phone testing. Implementation starts after this plan is reviewed.
+
 ## 1. Product goal
 
 Make EasyCode a dependable pocket playground for HTML, CSS and JavaScript. A user should be able to start from a blank fiddle or template, edit code, run it, inspect errors, save it, duplicate it and share an export without losing work.

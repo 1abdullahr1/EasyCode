@@ -11,6 +11,10 @@ import com.easycode.ide.data.model.Boilerplate
 import com.easycode.ide.data.model.ConsoleMessage
 import com.easycode.ide.data.model.ExternalResource
 import com.easycode.ide.data.model.FiddleEntity
+import com.easycode.ide.ui.editor.UndoRedoManager
+import com.easycode.ide.util.SourceFile
+import com.easycode.ide.util.NativeFiles
+import kotlinx.coroutines.CancellationException
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
@@ -56,9 +60,48 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
 
     private val _projectRevision = MutableLiveData(0L)
     val projectRevision: LiveData<Long> = _projectRevision
+    val editorHistory = mutableMapOf<String, UndoRedoManager>()
+    val sourceFiles = mutableMapOf<String, SourceFile>()
+    val folderUri = MutableLiveData(NativeFiles.savedFolder(application))
+    var pendingFileType: String? = null
+    var pendingFileRevision: Long? = null
+    var pendingFileContents: String? = null
+    var isSaving = false
+        private set
+    private var savedSnapshot = FiddleEntity(title = "Untitled fiddle", updatedAt = 0)
 
     private fun beginProject() {
+        editorHistory.values.forEach { it.clear() }
+        sourceFiles.clear()
         _projectRevision.value = (_projectRevision.value ?: 0L) + 1L
+    }
+
+    private fun snapshot() = FiddleEntity(
+        id = _currentFiddleId.value ?: 0,
+        title = _title.value.orEmpty(),
+        htmlCode = _htmlCode.value.orEmpty(),
+        cssCode = _cssCode.value.orEmpty(),
+        jsCode = _jsCode.value.orEmpty(),
+        resourcesJson = gson.toJson(_externalResources.value.orEmpty()),
+        updatedAt = 0,
+        description = savedSnapshot.description,
+        isStarred = savedSnapshot.isStarred
+    )
+
+    fun hasUnsavedChanges() = snapshot() != savedSnapshot
+
+    fun code(type: String): String = when (type) {
+        "CSS" -> _cssCode.value.orEmpty()
+        "JS" -> _jsCode.value.orEmpty()
+        else -> _htmlCode.value.orEmpty()
+    }
+
+    fun replaceCode(type: String, value: String) {
+        when (type) {
+            "CSS" -> updateCss(value)
+            "JS" -> updateJs(value)
+            else -> updateHtml(value)
+        }
     }
 
     fun updateTitle(newTitle: String) {
@@ -107,6 +150,7 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
 
     fun loadBoilerplate(bp: Boilerplate) {
         beginProject()
+        savedSnapshot = FiddleEntity(title = "Untitled fiddle", updatedAt = 0)
         _title.value = bp.title
         _htmlCode.value = bp.htmlCode
         _cssCode.value = bp.cssCode
@@ -117,16 +161,17 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
         triggerRun()
     }
 
-    fun newFiddle() {
-        beginProject()
-        _title.value = "Untitled fiddle"
-        _htmlCode.value = ""
-        _cssCode.value = ""
-        _jsCode.value = ""
-        _externalResources.value = emptyList()
-        _currentFiddleId.value = null
-        clearConsole()
-        triggerRun()
+    fun createNamedFiddle(name: String, onError: () -> Unit, onComplete: (Boolean) -> Unit) {
+        val title = name.trim()
+        if (title.isEmpty()) return
+        val project = FiddleEntity(title = title)
+        val previous = snapshot()
+        val revision = _projectRevision.value
+        storeFiddle(project, onError) { id ->
+            val canSwitch = revision == _projectRevision.value && previous == snapshot()
+            if (canSwitch) loadFiddle(project.copy(id = id))
+            onComplete(canSwitch)
+        }
     }
 
     fun loadFiddle(fiddle: FiddleEntity) {
@@ -144,34 +189,45 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
             emptyList()
         }
         _externalResources.value = resources
+        savedSnapshot = fiddle.copy(resourcesJson = gson.toJson(resources), updatedAt = 0)
         clearConsole()
         triggerRun()
     }
 
-    fun saveCurrentFiddle(onComplete: (Long) -> Unit) {
-        viewModelScope.launch {
-            val resourcesJson = gson.toJson(_externalResources.value.orEmpty())
-            val fiddle = FiddleEntity(
-                id = _currentFiddleId.value ?: 0,
-                title = _title.value ?: "Untitled fiddle",
-                htmlCode = _htmlCode.value.orEmpty(),
-                cssCode = _cssCode.value.orEmpty(),
-                jsCode = _jsCode.value.orEmpty(),
-                resourcesJson = resourcesJson,
-                updatedAt = System.currentTimeMillis()
-            )
-
-            val savedId = repository.saveFiddle(fiddle)
+    fun saveCurrentFiddle(onError: () -> Unit, onComplete: () -> Unit) {
+        val project = snapshot()
+        storeFiddle(project, onError) { savedId ->
             _currentFiddleId.value = savedId
+            savedSnapshot = project.copy(id = savedId)
+            onComplete()
+        }
+    }
+
+    private fun storeFiddle(project: FiddleEntity, onError: () -> Unit, onComplete: (Long) -> Unit) {
+        if (isSaving) return
+        isSaving = true
+        viewModelScope.launch {
+            val savedId = try {
+                repository.saveFiddle(project.copy(updatedAt = System.currentTimeMillis()))
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                onError()
+                return@launch
+            } finally {
+                isSaving = false
+            }
             onComplete(savedId)
         }
     }
 
     fun deleteFiddle(id: Long) {
+        if (isSaving) return
         viewModelScope.launch {
             repository.deleteFiddleById(id)
             if (_currentFiddleId.value == id) {
-                newFiddle()
+                _currentFiddleId.value = null
+                savedSnapshot = FiddleEntity(title = "Untitled fiddle", updatedAt = 0)
             }
         }
     }
