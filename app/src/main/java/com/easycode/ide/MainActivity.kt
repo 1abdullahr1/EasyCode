@@ -15,6 +15,9 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.children
+import androidx.core.view.updateLayoutParams
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.easycode.ide.data.model.FiddleEntity
@@ -51,7 +54,11 @@ class MainActivity : AppCompatActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
             val safe = insets.getInsets(WindowInsetsCompat.Type.systemBars() or
                 WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime())
-            view.setPadding(safe.left, safe.top, safe.right, safe.bottom)
+            binding.drawerLayout.children.forEach { child ->
+                child.updateLayoutParams<DrawerLayout.LayoutParams> {
+                    setMargins(safe.left, safe.top, safe.right, safe.bottom)
+                }
+            }
             WindowInsetsCompat.CONSUMED
         }
         workspace = WorkspaceFiles(this, viewModel, ::activeEditorType, ::selectEditor, ::exportProjectHtml)

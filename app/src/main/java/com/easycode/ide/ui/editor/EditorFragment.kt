@@ -120,11 +120,14 @@ class EditorFragment : Fragment() {
             undoRedoManager.recordSnapshot("")
             applyEditorAction("")
             val undo = Snackbar.make(binding.root, "$language cleared", Snackbar.LENGTH_LONG)
-            activity?.findViewById<View>(R.id.bottom_navigation)?.let { undo.setAnchorView(it) }
+                .setBackgroundTint(requireContext().getColor(R.color.surfaceVariant))
+                .setTextColor(requireContext().getColor(R.color.onSurface))
+                .setActionTextColor(requireContext().getColor(R.color.primary))
+            activity?.findViewById<View>(R.id.keyboard_accessory_scroll)?.let { undo.setAnchorView(it) }
             undo.setAction("Undo") {
-                    if (revision == viewModel.projectRevision.value && viewModel.code(editorType).isEmpty()) {
-                        undoRedoManager.undo("")?.let { viewModel.replaceCode(editorType, it) }
-                    }
+                if (revision == viewModel.projectRevision.value && viewModel.code(editorType).isEmpty()) {
+                    undoRedoManager.undo("")?.let { viewModel.replaceCode(editorType, it) }
+                }
             }.show()
         }
 
