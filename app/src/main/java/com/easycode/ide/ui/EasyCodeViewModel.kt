@@ -15,6 +15,7 @@ import com.easycode.ide.ui.editor.UndoRedoManager
 import com.easycode.ide.util.SourceFile
 import com.easycode.ide.util.NativeFiles
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.sync.Mutex
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
@@ -62,6 +63,7 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
     val projectRevision: LiveData<Long> = _projectRevision
     val editorHistory = mutableMapOf<String, UndoRedoManager>()
     val sourceFiles = mutableMapOf<String, SourceFile>()
+    val fileOperations = Mutex()
     val folderUri = MutableLiveData(NativeFiles.savedFolder(application))
     var pendingFileType: String? = null
     var pendingFileRevision: Long? = null
@@ -143,7 +145,6 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
         _htmlCode.value = ""
         _cssCode.value = ""
         _jsCode.value = ""
-        _externalResources.value = emptyList()
         clearConsole()
         triggerRun()
     }

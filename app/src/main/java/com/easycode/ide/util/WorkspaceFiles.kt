@@ -11,6 +11,7 @@ import com.easycode.ide.ui.EasyCodeViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 class WorkspaceFiles(
@@ -208,7 +209,7 @@ class WorkspaceFiles(
     private fun io(fallback: String, action: suspend () -> Unit) {
         activity.lifecycleScope.launch {
             try {
-                action()
+                model.fileOperations.withLock { action() }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {

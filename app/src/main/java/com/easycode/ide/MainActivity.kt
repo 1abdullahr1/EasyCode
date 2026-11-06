@@ -374,6 +374,7 @@ class MainActivity : AppCompatActivity() {
         dialog.setOnShowListener {
             val create = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             create.isEnabled = false
+            input.requestFocus()
             input.doAfterTextChanged { create.isEnabled = !it.isNullOrBlank() }
         }
         dialog.show()
