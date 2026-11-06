@@ -119,12 +119,13 @@ class EditorFragment : Fragment() {
             undoRedoManager.recordSnapshot(original)
             undoRedoManager.recordSnapshot("")
             applyEditorAction("")
-            Snackbar.make(binding.root, "$language cleared", Snackbar.LENGTH_LONG)
-                .setAction("Undo") {
+            val undo = Snackbar.make(binding.root, "$language cleared", Snackbar.LENGTH_LONG)
+            activity?.findViewById<View>(R.id.bottom_navigation)?.let { undo.setAnchorView(it) }
+            undo.setAction("Undo") {
                     if (revision == viewModel.projectRevision.value && viewModel.code(editorType).isEmpty()) {
                         undoRedoManager.undo("")?.let { viewModel.replaceCode(editorType, it) }
                     }
-                }.show()
+            }.show()
         }
 
         binding.btnCopy.setOnClickListener {

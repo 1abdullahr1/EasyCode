@@ -33,7 +33,6 @@ class EditorDeviceTest {
             assertTrue(device.takeScreenshot(File(directory, "$name.png")))
         }
         context.startActivity(Intent(context, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-        capture("dark-editor")
         openDrawer()
         element(id("btn_drawer_new_fiddle")).click()
         val create = element(By.text("Create"))
@@ -57,6 +56,7 @@ class EditorDeviceTest {
             assertEquals(source, editor.text)
         }
 
+        capture("dark-editor")
         openDrawer()
         element(id("btn_drawer_settings")).click()
         element(id("rb_theme_light")).click()
