@@ -68,5 +68,5 @@
     <color name="console_badge_info_bg">#0A2640</color>
 
     <color name="nav_active_indicator">#F59E0B</color>
-    <color name="ic_launcher_background">#18181E</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
 </resources>
