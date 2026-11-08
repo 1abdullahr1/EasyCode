@@ -18,8 +18,8 @@ This is the current source status. Items remain unverified until the cloud workf
 - [x] Require HTTPS for added external libraries, skip invalid stored resource URLs in preview output, and disable app cleartext traffic.
 - [x] Bound console output to 300 messages and 4,000 characters per message.
 - [x] Add a manual signed AAB workflow that requires the upload key only from protected GitHub repository secrets.
-- [ ] Run cloud unit tests, lint, debug APK build and API 36 emulator smoke; review results and address failures.
-- [ ] Configure protected upload-key secrets and run the manual AAB workflow; do not submit the bundle to Play as part of this implementation.
+- [x] Run cloud unit tests, lint, debug APK build and API 36 emulator smoke. GitHub Actions run `42513008452` passed for commit `496b7e6` on 8 November 2026; the debug APK artifact was uploaded.
+- [ ] Configure protected upload-key secrets and merge this branch to `main` before the manual AAB workflow can be dispatched. Do not submit the bundle to Play as part of this implementation.
 - [ ] Complete remaining editor, preview recovery, accessibility, privacy and physical-device release checks in the milestones below.
 
 ## Next implementation batch — phone review feedback, 6 November 2026
