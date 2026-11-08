@@ -28,6 +28,7 @@ import com.easycode.ide.ui.LayoutMode
 import com.easycode.ide.ui.MainPagerAdapter
 import com.easycode.ide.ui.adapters.SavedFiddleAdapter
 import com.easycode.ide.ui.dialogs.BoilerplatesBottomSheet
+import com.easycode.ide.ui.dialogs.AboutBottomSheet
 import com.easycode.ide.ui.dialogs.ResourcesBottomSheet
 import com.easycode.ide.ui.dialogs.SettingsBottomSheet
 import com.easycode.ide.ui.editor.EditorFragment
@@ -223,6 +224,11 @@ class MainActivity : AppCompatActivity() {
         binding.btnDrawerSettings.setOnClickListener {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
             SettingsBottomSheet.newInstance().show(supportFragmentManager, SettingsBottomSheet.TAG)
+        }
+
+        binding.btnDrawerAbout.setOnClickListener {
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+            AboutBottomSheet.newInstance().show(supportFragmentManager, AboutBottomSheet.TAG)
         }
     }
 

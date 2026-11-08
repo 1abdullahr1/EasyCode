@@ -395,6 +395,34 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/btn_drawer_about"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_info_circle"
+                app:tint="?attr/colorOnSurface"
+                android:contentDescription="@string/action_about" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/action_about"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>
