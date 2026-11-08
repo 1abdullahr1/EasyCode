@@ -54,6 +54,7 @@ jobs:
           retention-days: 7
   device:
     name: Editor smoke test
+    if: github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 25

@@ -19,6 +19,7 @@ This is the current source status. Items remain unverified until the cloud workf
 - [x] Bound console output to 300 messages and 4,000 characters per message.
 - [x] Add a manual signed AAB workflow that requires the upload key only from protected GitHub repository secrets.
 - [x] Apply the approved orange-cloud and white-code logo to both adaptive launcher icons and all in-app logo placements.
+- [x] Make emulator smoke checks manual-only; ask the user before each emulator run. Automatic push builds still run unit checks, lint and build APKs.
 - [x] Run cloud unit tests, lint, debug APK build and API 36 emulator smoke. GitHub Actions run `42513008452` passed for commit `496b7e6` on 8 November 2026; the debug APK artifact was uploaded.
 - [ ] Configure protected upload-key secrets and merge this branch to `main` before the manual AAB workflow can be dispatched. Do not submit the bundle to Play as part of this implementation.
 - [ ] Complete remaining editor, preview recovery, accessibility, privacy and physical-device release checks in the milestones below.
