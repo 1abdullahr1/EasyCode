@@ -37,8 +37,8 @@ jobs:
           test -n "$KEYSTORE_PASSWORD" || { echo "Missing PLAY_UPLOAD_KEYSTORE_PASSWORD repository secret"; exit 1; }
           test -n "$KEY_ALIAS" || { echo "Missing PLAY_UPLOAD_KEY_ALIAS repository secret"; exit 1; }
           test -n "$KEY_PASSWORD" || { echo "Missing PLAY_UPLOAD_KEY_PASSWORD repository secret"; exit 1; }
-          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/easycode-upload.jks"
-          echo "PLAY_UPLOAD_KEYSTORE_PATH=$RUNNER_TEMP/easycode-upload.jks" >> "$GITHUB_ENV"
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/easycode-upload.p12"
+          echo "PLAY_UPLOAD_KEYSTORE_PATH=$RUNNER_TEMP/easycode-upload.p12" >> "$GITHUB_ENV"
           echo "PLAY_UPLOAD_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
           echo "PLAY_UPLOAD_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
           echo "PLAY_UPLOAD_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"

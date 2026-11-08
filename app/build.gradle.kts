@@ -21,6 +21,7 @@ android {
     signingConfigs {
         create("playUpload") {
             storeFile = System.getenv("PLAY_UPLOAD_KEYSTORE_PATH")?.let { file(it) }
+            storeType = "PKCS12"
             storePassword = System.getenv("PLAY_UPLOAD_KEYSTORE_PASSWORD")
             keyAlias = System.getenv("PLAY_UPLOAD_KEY_ALIAS")
             keyPassword = System.getenv("PLAY_UPLOAD_KEY_PASSWORD")
