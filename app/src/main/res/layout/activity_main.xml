@@ -31,9 +31,9 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_easycode_logo"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/easycode_cloud_code_logo"
                         android:contentDescription="@string/app_name" />
 
                     <LinearLayout
@@ -227,9 +227,9 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_easycode_logo"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/easycode_cloud_code_logo"
                     android:contentDescription="@string/app_name" />
 
                 <TextView
