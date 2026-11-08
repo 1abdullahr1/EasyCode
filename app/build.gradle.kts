@@ -6,20 +6,30 @@ plugins {
 
 android {
     namespace = "com.easycode.ide"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.easycode.ide"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("playUpload") {
+            storeFile = System.getenv("PLAY_UPLOAD_KEYSTORE_PATH")?.let { file(it) }
+            storePassword = System.getenv("PLAY_UPLOAD_KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("PLAY_UPLOAD_KEY_ALIAS")
+            keyPassword = System.getenv("PLAY_UPLOAD_KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("playUpload")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

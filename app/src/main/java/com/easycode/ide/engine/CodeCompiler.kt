@@ -14,7 +14,7 @@ object CodeCompiler {
         val jsScripts = StringBuilder()
         var hasBabel = false
 
-        resources.filter { it.isEnabled }.forEach { res ->
+        resources.filter { it.isEnabled && it.hasSafeHttpsUrl() }.forEach { res ->
             if (res.isCss) {
                 cssLinks.append("  <link rel=\"stylesheet\" href=\"${escapeUrl(res.url)}\" />\n")
             } else {
@@ -59,7 +59,7 @@ $css
 
     function send(level, args, line) {
       try {
-        var msg = Array.prototype.slice.call(args).map(serialize).join(" ");
+        var msg = Array.prototype.slice.call(args).map(serialize).join(" ").slice(0, 4000);
         if (window.EasyCodeBridge && window.EasyCodeBridge.postMessage) {
           window.EasyCodeBridge.postMessage(level, msg, line || 0);
         }

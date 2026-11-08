@@ -93,6 +93,12 @@ class ResourcesBottomSheet : BottomSheetDialogFragment() {
                 return@setOnClickListener
             }
 
+            val candidate = ExternalResource(name = "External Library", url = url, isCss = false)
+            if (!candidate.hasSafeHttpsUrl()) {
+                binding.etResourceUrl.error = "Enter a valid HTTPS URL"
+                return@setOnClickListener
+            }
+
             val isCss = url.endsWith(".css") || url.contains("/css")
             val name = url.substringAfterLast("/").substringBefore("?").ifBlank { "External Library" }
 

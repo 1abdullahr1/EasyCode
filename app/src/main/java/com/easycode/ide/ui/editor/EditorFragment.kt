@@ -13,6 +13,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.Button
+import android.text.InputType
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.easycode.ide.R
@@ -20,6 +24,7 @@ import com.easycode.ide.databinding.FragmentEditorBinding
 import com.easycode.ide.ui.EasyCodeViewModel
 import com.easycode.ide.util.EditorPreferences
 import com.google.android.material.snackbar.Snackbar
+import androidx.appcompat.app.AlertDialog
 
 class EditorFragment : Fragment() {
 
@@ -104,10 +109,6 @@ class EditorFragment : Fragment() {
             if (next != null) {
                 applyEditorAction(next)
             }
-        }
-
-        binding.btnFormat.setOnClickListener {
-            formatCode()
         }
 
         val language = if (editorType == TYPE_JS) "JavaScript" else editorType
@@ -215,48 +216,133 @@ class EditorFragment : Fragment() {
         if (editor.tvLineNumbers.text.toString() != numbers) editor.tvLineNumbers.text = numbers
     }
 
-    private fun formatCode() {
-        val text = binding.etCode.text?.toString().orEmpty()
-        if (text.isBlank()) return
-
-        val formatted = when (editorType) {
-            TYPE_HTML -> simpleIndentFormat(text)
-            TYPE_CSS -> simpleIndentFormat(text)
-            TYPE_JS -> simpleIndentFormat(text)
-            else -> text
+    fun showFindReplaceDialog() {
+        val context = requireContext()
+        val findInput = EditText(context).apply {
+            hint = "Find in ${editorType.lowercase()}"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            setSingleLine(true)
         }
-        undoRedoManager.recordSnapshot(formatted)
-        applyEditorAction(formatted)
-        Toast.makeText(requireContext(), getString(R.string.action_format), Toast.LENGTH_SHORT).show()
+        val replaceInput = EditText(context).apply {
+            hint = "Replace with"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+            setSingleLine(true)
+        }
+        val actions = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            addView(Button(context).apply {
+                text = "Find next"
+                setOnClickListener { findNext(findInput.text.toString()) }
+            }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+            addView(Button(context).apply {
+                text = "Replace"
+                setOnClickListener { replaceNext(findInput.text.toString(), replaceInput.text.toString()) }
+            }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+            addView(Button(context).apply {
+                text = "Replace all"
+                setOnClickListener { replaceAll(findInput.text.toString(), replaceInput.text.toString()) }
+            }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+        }
+        val content = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            val horizontalPadding = (20 * resources.displayMetrics.density).toInt()
+            setPadding(horizontalPadding, 0, horizontalPadding, 0)
+            addView(findInput)
+            addView(replaceInput)
+            addView(actions)
+        }
+        AlertDialog.Builder(context)
+            .setTitle("Find and replace")
+            .setView(content)
+            .setNegativeButton("Close", null)
+            .show()
     }
 
-    private fun simpleIndentFormat(input: String): String {
-        val indent = " ".repeat(EditorPreferences.indent(requireContext()))
-        val lines = input.lines()
-        val result = StringBuilder()
-        var indentLevel = 0
-
-        for (rawLine in lines) {
-            val line = rawLine.trim()
-            if (line.isEmpty()) {
-                result.append("\n")
-                continue
-            }
-
-            // Decrease indent if line closes a block
-            if (line.startsWith("}") || line.startsWith("</") || line.startsWith("]")) {
-                indentLevel = maxOf(0, indentLevel - 1)
-            }
-
-            result.append(indent.repeat(indentLevel)).append(line).append("\n")
-
-            // Increase indent if line opens a block
-            if (line.endsWith("{") || (line.startsWith("<") && !line.startsWith("</") && !line.endsWith("/>") && !line.contains("</")) || line.endsWith("[")) {
-                indentLevel++
-            }
+    private fun findNext(query: String) {
+        if (query.isEmpty()) {
+            Toast.makeText(requireContext(), "Enter text to find", Toast.LENGTH_SHORT).show()
+            return
         }
+        val text = binding.etCode.text?.toString().orEmpty()
+        val from = binding.etCode.selectionEnd.coerceAtLeast(0).coerceAtMost(text.length)
+        val found = text.indexOf(query, from).takeIf { it >= 0 } ?: text.indexOf(query)
+        if (found < 0) {
+            Toast.makeText(requireContext(), "No match found", Toast.LENGTH_SHORT).show()
+            return
+        }
+        binding.etCode.requestFocus()
+        binding.etCode.setSelection(found, found + query.length)
+        binding.editorScroll.smoothScrollTo(0, binding.etCode.top + (binding.etCode.layout?.getLineTop(binding.etCode.layout?.getLineForOffset(found) ?: 0) ?: 0))
+    }
 
-        return result.toString().trimEnd()
+    private fun replaceNext(query: String, replacement: String) {
+        if (query.isEmpty()) {
+            Toast.makeText(requireContext(), "Enter text to find", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val text = binding.etCode.text?.toString().orEmpty()
+        val start = binding.etCode.selectionStart
+        val end = binding.etCode.selectionEnd
+        val selectedMatch = start >= 0 && end - start == query.length && text.regionMatches(start, query, 0, query.length)
+        val from = if (selectedMatch) start else binding.etCode.selectionEnd.coerceAtLeast(0).coerceAtMost(text.length)
+        val match = if (selectedMatch) start else text.indexOf(query, from).takeIf { it >= 0 } ?: text.indexOf(query)
+        if (match < 0) {
+            Toast.makeText(requireContext(), "No match found", Toast.LENGTH_SHORT).show()
+            return
+        }
+        undoRedoManager.recordSnapshot(text)
+        val updated = text.replaceRange(match, match + query.length, replacement)
+        undoRedoManager.recordSnapshot(updated)
+        applyEditorAction(updated)
+        val next = (match + replacement.length).coerceAtMost(updated.length)
+        binding.etCode.setSelection(next)
+    }
+
+    private fun replaceAll(query: String, replacement: String) {
+        if (query.isEmpty()) {
+            Toast.makeText(requireContext(), "Enter text to find", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val text = binding.etCode.text?.toString().orEmpty()
+        val updated = text.replace(query, replacement)
+        if (updated == text) {
+            Toast.makeText(requireContext(), "No matches found", Toast.LENGTH_SHORT).show()
+            return
+        }
+        undoRedoManager.recordSnapshot(text)
+        undoRedoManager.recordSnapshot(updated)
+        applyEditorAction(updated)
+        Toast.makeText(requireContext(), "Text replaced", Toast.LENGTH_SHORT).show()
+    }
+
+    fun showGoToLineDialog() {
+        val text = binding.etCode.text?.toString().orEmpty()
+        val lineCount = text.count { it == '\n' } + 1
+        val input = EditText(requireContext()).apply {
+            hint = "Line number (1–$lineCount)"
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setSingleLine(true)
+        }
+        AlertDialog.Builder(requireContext())
+            .setTitle("Go to line")
+            .setView(input)
+            .setNegativeButton("Cancel", null)
+            .setPositiveButton("Go") { _, _ ->
+                val requested = input.text.toString().toIntOrNull()
+                if (requested == null || requested !in 1..lineCount) {
+                    Toast.makeText(requireContext(), "Choose a line from 1 to $lineCount", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                val offset = text.lineSequence().take(requested - 1).sumOf { it.length + 1 }.coerceAtMost(text.length)
+                binding.etCode.requestFocus()
+                binding.etCode.setSelection(offset)
+                val layout = binding.etCode.layout
+                if (layout != null) {
+                    val line = layout.getLineForOffset(offset)
+                    binding.editorScroll.smoothScrollTo(0, binding.etCode.top + layout.getLineTop(line))
+                }
+            }
+            .show()
     }
 
     fun insertTextAtCursor(insertion: String) {

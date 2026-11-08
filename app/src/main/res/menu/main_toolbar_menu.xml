@@ -33,9 +33,13 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_format"
-        android:icon="@drawable/ic_format"
-        android:title="@string/action_format"
+        android:id="@+id/action_find_replace"
+        android:title="Find and replace"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_go_to_line"
+        android:title="Go to line"
         app:showAsAction="never" />
 
     <item

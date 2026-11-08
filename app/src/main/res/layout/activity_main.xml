@@ -36,17 +36,32 @@
                         android:src="@drawable/ic_easycode_logo"
                         android:contentDescription="@string/app_name" />
 
-                    <TextView
-                        android:id="@+id/tv_project_title"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
-                        android:text="@string/fiddle_title_hint"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="17sp"
-                        android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tv_project_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/fiddle_title_hint"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="17sp"
+                            android:textStyle="bold"
+                            android:maxLines="1"
+                            android:ellipsize="end" />
+
+                        <TextView
+                            android:id="@+id/tv_draft_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="10sp"
+                            android:maxLines="1"
+                            android:visibility="gone" />
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -152,6 +167,37 @@
                 app:menu="@menu/bottom_nav_menu" />
 
         </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/workspace_loading_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/colorSurface"
+            android:clickable="true"
+            android:focusable="true"
+            android:elevation="20dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ProgressBar
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:indeterminate="true" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Restoring your workspace…"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </FrameLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -1,8 +1,26 @@
 # EasyCode: completion and Google Play release plan
 
 Created: 1 November 2026  
-Status: Implementation in progress; initial correctness fixes passed cloud tests and debug build.  
+Status: Implementation in progress; current source changes await GitHub Actions validation.
 Product reference: JSFiddle. Platform: Android. Scope: EasyCode in `app/`.
+
+## Implementation progress — 8 November 2026
+
+This is the current source status. Items remain unverified until the cloud workflow passes and the generated APK is reviewed on a phone.
+
+- [x] Set compile and target SDK to API 36 and update Android Gradle Plugin to 8.10.1; the existing wrapper is Gradle 8.11.1.
+- [x] Add a version 1 to 2 Room migration for autosaved workspace drafts without deleting saved fiddles; remove destructive migration fallback.
+- [x] Restore the workspace before enabling editor interaction, debounce draft persistence, and show draft save/restore status.
+- [x] Save existing fiddles by their existing ID instead of inserting duplicates on each Save.
+- [x] Add versioned JSON project backup import/export with a 2 MB limit, schema checks, HTTPS-only external resources and a replacement confirmation.
+- [x] Add plain-text find/replace and go-to-line actions to the active HTML, CSS or JavaScript editor.
+- [x] Remove the unsafe line-based formatter; restore formatting only with a syntax-aware implementation.
+- [x] Require HTTPS for added external libraries, skip invalid stored resource URLs in preview output, and disable app cleartext traffic.
+- [x] Bound console output to 300 messages and 4,000 characters per message.
+- [x] Add a manual signed AAB workflow that requires the upload key only from protected GitHub repository secrets.
+- [ ] Run cloud unit tests, lint, debug APK build and API 36 emulator smoke; review results and address failures.
+- [ ] Configure protected upload-key secrets and run the manual AAB workflow; do not submit the bundle to Play as part of this implementation.
+- [ ] Complete remaining editor, preview recovery, accessibility, privacy and physical-device release checks in the milestones below.
 
 ## Next implementation batch — phone review feedback, 6 November 2026
 
@@ -78,7 +96,7 @@ This baseline is from source inspection, not a device test. An existing debug AP
 | --- | --- |
 | Native Android app | Kotlin, XML views, ViewPager2, Material components, Room and WebView |
 | Identity | `com.easycode.ide`, version `1.0.0`; debug adds `.debug` |
-| Platform | Minimum API 26; compile/target API 35 |
+| Platform | Minimum API 26; compile/target API 36 |
 | Core workflow | Editing, preview, console, local save/load, resources and six templates have implementation code |
 | Editor correctness | Undo/redo/format update the visible editor without synchronizing the shared code state |
 | Draft safety | Manual save exists; persistent unsaved drafts and replacement prompts are missing |
@@ -139,9 +157,9 @@ Primary files: `ui/editor/EditorFragment.kt`, `ui/editor/UndoRedoManager.kt`, `u
 
 - [ ] Add local duplicate/fork, rename, search and sort by recent update/title.
 - [ ] Implement font size, word wrap and auto-run preferences with persistence and immediate application.
-- [ ] Add find/replace, go-to-line, indentation/outdent and predictable bracket/tag assistance.
+- [x] Add find/replace and go-to-line for the active panel. Indentation/outdent and bracket/tag assistance remain open.
 - [ ] Evaluate retaining the current editor versus adopting a maintained Android editor component. Record license, APK size, accessibility and large-file behavior before choosing.
-- [ ] Replace the simple formatter with language-aware formatting, or remove the action from 1.0 until it is reliable. Never silently modify code semantics.
+- [x] Remove the simple formatter from the UI because it could alter meaningful whitespace. Add a syntax-aware formatter only after selecting and reviewing a maintained library.
 - [ ] Route symbol keys and shortcuts to the focused visible editor in both layout modes.
 - [ ] Add structured project backup/import with a versioned schema, size validation and useful invalid-file errors.
 - [ ] Add Save HTML through Android's document picker as well as Share HTML. Explain that externally hosted resources remain network-dependent.

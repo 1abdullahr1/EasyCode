@@ -238,6 +238,15 @@ class MainActivity : AppCompatActivity() {
         viewModel.layoutMode.observe(this) { mode ->
             updateLayoutMode(mode)
         }
+
+        viewModel.isReady.observe(this) { ready ->
+            binding.workspaceLoadingOverlay.visibility = if (ready) View.GONE else View.VISIBLE
+        }
+
+        viewModel.draftStatus.observe(this) { status ->
+            binding.tvDraftStatus.text = status
+            binding.tvDraftStatus.visibility = if (status.isNullOrBlank()) View.GONE else View.VISIBLE
+        }
     }
 
     private fun updateLayoutMode(mode: LayoutMode) {
@@ -292,6 +301,14 @@ class MainActivity : AppCompatActivity() {
                 ResourcesBottomSheet.newInstance().show(supportFragmentManager, ResourcesBottomSheet.TAG)
                 true
             }
+            R.id.action_find_replace -> {
+                activeEditorFragment()?.showFindReplaceDialog()
+                true
+            }
+            R.id.action_go_to_line -> {
+                activeEditorFragment()?.showGoToLineDialog()
+                true
+            }
             R.id.action_export_html -> {
                 exportProjectHtml()
                 true
@@ -321,6 +338,17 @@ class MainActivity : AppCompatActivity() {
         MainPagerAdapter.TAB_CSS -> EditorFragment.TYPE_CSS
         MainPagerAdapter.TAB_JS -> EditorFragment.TYPE_JS
         else -> if (viewModel.layoutMode.value == LayoutMode.SPLIT) EditorFragment.TYPE_HTML else null
+    }
+
+    private fun activeEditorFragment(): EditorFragment? {
+        if (viewModel.layoutMode.value == LayoutMode.SPLIT) {
+            return supportFragmentManager.findFragmentById(R.id.split_editor_container) as? EditorFragment
+        }
+        val position = binding.viewPager.currentItem
+        if (position !in 0..2) return null
+        val fragment = supportFragmentManager.findFragmentByTag("f${pagerAdapter.getItemId(position)}")
+            ?: pagerAdapter.getFragmentAt(position)
+        return fragment as? EditorFragment
     }
 
     private fun selectEditor(type: String) {
@@ -443,5 +471,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun dpToPx(dp: Int): Int {
         return (dp * resources.displayMetrics.density).toInt()
+    }
+
+    override fun onStop() {
+        viewModel.saveDraftNow()
+        super.onStop()
     }
 }

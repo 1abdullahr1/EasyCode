@@ -6,19 +6,27 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.easycode.ide.data.model.DraftEntity
 import com.easycode.ide.EasyCodeApp
 import com.easycode.ide.data.model.Boilerplate
 import com.easycode.ide.data.model.ConsoleMessage
 import com.easycode.ide.data.model.ExternalResource
 import com.easycode.ide.data.model.FiddleEntity
+import com.easycode.ide.data.model.ProjectArchive
 import com.easycode.ide.ui.editor.UndoRedoManager
 import com.easycode.ide.util.SourceFile
 import com.easycode.ide.util.NativeFiles
+import com.easycode.ide.util.ProjectArchiveCodec
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 enum class LayoutMode {
     TABS,
@@ -29,6 +37,14 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
 
     private val repository = (application as EasyCodeApp).fiddleRepository
     private val gson = Gson()
+    private var draftSaveJob: Job? = null
+    private val draftMutex = Mutex()
+    private var ready = false
+
+    private val _isReady = MutableLiveData(false)
+    val isReady: LiveData<Boolean> = _isReady
+    private val _draftStatus = MutableLiveData("")
+    val draftStatus: LiveData<String> = _draftStatus
 
     val savedFiddles: LiveData<List<FiddleEntity>> = repository.allFiddles.asLiveData()
 
@@ -68,9 +84,105 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
     var pendingFileType: String? = null
     var pendingFileRevision: Long? = null
     var pendingFileContents: String? = null
+    var pendingArchiveJson: String? = null
     var isSaving = false
         private set
     private var savedSnapshot = FiddleEntity(title = "Untitled fiddle", updatedAt = 0)
+
+    init {
+        viewModelScope.launch {
+            val draftResult = runCatching { withContext(Dispatchers.IO) { repository.getDraft() } }
+            val draft = draftResult.getOrNull()
+            if (draftResult.isFailure) _draftStatus.value = "Draft could not be loaded"
+            if (draft != null) {
+                val restored = runCatching {
+                    gson.fromJson(draft.stateJson, FiddleEntity::class.java) to
+                        gson.fromJson(draft.savedSnapshotJson, FiddleEntity::class.java)
+                }.getOrNull()
+                if (restored != null && restored.first != null && restored.second != null &&
+                    !restored.first.title.isNullOrBlank() && !restored.second.title.isNullOrBlank() &&
+                    restored.first.htmlCode != null && restored.first.cssCode != null && restored.first.jsCode != null &&
+                    restored.second.htmlCode != null && restored.second.cssCode != null && restored.second.jsCode != null
+                ) {
+                    restoreDraft(restored.first, restored.second)
+                    _draftStatus.value = "Draft restored"
+                } else {
+                    runCatching { withContext(Dispatchers.IO) { repository.clearDraft() } }
+                    _draftStatus.value = "Draft could not be restored"
+                }
+            }
+            ready = true
+            _isReady.value = true
+        }
+    }
+
+    private fun restoreDraft(state: FiddleEntity, baseline: FiddleEntity) {
+        _currentFiddleId.value = state.id.takeIf { it > 0 }
+        _title.value = state.title
+        _htmlCode.value = state.htmlCode
+        _cssCode.value = state.cssCode
+        _jsCode.value = state.jsCode
+        _externalResources.value = parseResources(state.resourcesJson)
+        savedSnapshot = baseline.copy(resourcesJson = gson.toJson(parseResources(baseline.resourcesJson)), updatedAt = 0)
+        beginProject()
+        clearConsole()
+        triggerRun()
+    }
+
+    private fun parseResources(json: String): List<ExternalResource> = try {
+        val type = object : TypeToken<List<ExternalResource>>() {}.type
+        gson.fromJson<List<ExternalResource>>(json, type)?.filter { it?.hasSafeHttpsUrl() == true } ?: emptyList()
+    } catch (_: Exception) {
+        emptyList()
+    }
+
+    private fun scheduleDraftSave() {
+        if (!ready) return
+        _draftStatus.value = "Saving draft"
+        draftSaveJob?.cancel()
+        draftSaveJob = viewModelScope.launch {
+            delay(700)
+            draftMutex.withLock {
+                val state = snapshot()
+                val baseline = savedSnapshot.copy(updatedAt = 0)
+                try {
+                    val stateJson = withContext(Dispatchers.Default) { gson.toJson(state) }
+                    val baselineJson = withContext(Dispatchers.Default) { gson.toJson(baseline) }
+                    withContext(Dispatchers.IO) {
+                        repository.saveDraft(DraftEntity(stateJson = stateJson, savedSnapshotJson = baselineJson))
+                    }
+                    _draftStatus.postValue("Draft saved")
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    _draftStatus.postValue("Draft save failed")
+                }
+            }
+        }
+    }
+
+    fun saveDraftNow() {
+        if (!ready) return
+        draftSaveJob?.cancel()
+        draftSaveJob = viewModelScope.launch {
+            draftMutex.withLock {
+                try {
+                    val state = snapshot()
+                    val baseline = savedSnapshot.copy(updatedAt = 0)
+                    val stateJson = withContext(Dispatchers.Default) { gson.toJson(state) }
+                    val baselineJson = withContext(Dispatchers.Default) { gson.toJson(baseline) }
+                    withContext(Dispatchers.IO) {
+                        repository.saveDraft(DraftEntity(stateJson = stateJson, savedSnapshotJson = baselineJson))
+                    }
+                    _draftStatus.postValue("Draft saved")
+                } catch (cancelled: CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    _draftStatus.postValue("Draft save failed")
+                }
+            }
+        }
+    }
 
     private fun beginProject() {
         editorHistory.values.forEach { it.clear() }
@@ -108,18 +220,22 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
 
     fun updateTitle(newTitle: String) {
         _title.value = newTitle
+        scheduleDraftSave()
     }
 
     fun updateHtml(code: String) {
         _htmlCode.value = code
+        scheduleDraftSave()
     }
 
     fun updateCss(code: String) {
         _cssCode.value = code
+        scheduleDraftSave()
     }
 
     fun updateJs(code: String) {
         _jsCode.value = code
+        scheduleDraftSave()
     }
 
     fun triggerRun() {
@@ -133,7 +249,8 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
 
     fun addConsoleMessage(message: ConsoleMessage) {
         val current = _consoleMessages.value.orEmpty().toMutableList()
-        current.add(message)
+        current.add(message.copy(message = message.message.take(4_000)))
+        if (current.size > 300) current.subList(0, current.size - 300).clear()
         _consoleMessages.value = current
     }
 
@@ -147,6 +264,7 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
         _jsCode.value = ""
         clearConsole()
         triggerRun()
+        scheduleDraftSave()
     }
 
     fun loadBoilerplate(bp: Boilerplate) {
@@ -160,6 +278,7 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
         _currentFiddleId.value = null
         clearConsole()
         triggerRun()
+        scheduleDraftSave()
     }
 
     fun createNamedFiddle(name: String, onError: () -> Unit, onComplete: (Boolean) -> Unit) {
@@ -183,23 +302,21 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
         _cssCode.value = fiddle.cssCode
         _jsCode.value = fiddle.jsCode
 
-        val resources: List<ExternalResource> = try {
-            val type = object : TypeToken<List<ExternalResource>>() {}.type
-            gson.fromJson(fiddle.resourcesJson, type) ?: emptyList()
-        } catch (_: Exception) {
-            emptyList()
-        }
+        val resources = parseResources(fiddle.resourcesJson)
         _externalResources.value = resources
         savedSnapshot = fiddle.copy(resourcesJson = gson.toJson(resources), updatedAt = 0)
         clearConsole()
         triggerRun()
+        scheduleDraftSave()
     }
 
     fun saveCurrentFiddle(onError: () -> Unit, onComplete: () -> Unit) {
         val project = snapshot()
         storeFiddle(project, onError) { savedId ->
             _currentFiddleId.value = savedId
-            savedSnapshot = project.copy(id = savedId)
+            savedSnapshot = project.copy(id = savedId, updatedAt = 0)
+            _draftStatus.value = "Saved"
+            scheduleDraftSave()
             onComplete()
         }
     }
@@ -229,16 +346,19 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
             if (_currentFiddleId.value == id) {
                 _currentFiddleId.value = null
                 savedSnapshot = FiddleEntity(title = "Untitled fiddle", updatedAt = 0)
+                scheduleDraftSave()
             }
         }
     }
 
     fun addExternalResource(resource: ExternalResource) {
+        if (!resource.hasSafeHttpsUrl()) return
         val current = _externalResources.value.orEmpty().toMutableList()
         if (current.none { it.url.equals(resource.url, ignoreCase = true) }) {
             current.add(resource)
             _externalResources.value = current
             triggerRun()
+            scheduleDraftSave()
         }
     }
 
@@ -247,5 +367,28 @@ class EasyCodeViewModel(application: Application) : AndroidViewModel(application
         current.removeAll { it.id == id }
         _externalResources.value = current
         triggerRun()
+        scheduleDraftSave()
+    }
+
+    fun exportProjectArchive(): String = ProjectArchiveCodec.encode(
+        title = _title.value.orEmpty(),
+        html = _htmlCode.value.orEmpty(),
+        css = _cssCode.value.orEmpty(),
+        javascript = _jsCode.value.orEmpty(),
+        resources = _externalResources.value.orEmpty()
+    )
+
+    fun importProjectArchive(archive: ProjectArchive) {
+        beginProject()
+        _currentFiddleId.value = null
+        _title.value = archive.title
+        _htmlCode.value = archive.html
+        _cssCode.value = archive.css
+        _jsCode.value = archive.javascript
+        _externalResources.value = archive.resources
+        savedSnapshot = FiddleEntity(title = "Untitled fiddle", updatedAt = 0)
+        clearConsole()
+        triggerRun()
+        scheduleDraftSave()
     }
 }

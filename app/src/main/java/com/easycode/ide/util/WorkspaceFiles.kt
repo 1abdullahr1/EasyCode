@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.easycode.ide.MainActivity
 import com.easycode.ide.ui.EasyCodeViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +36,21 @@ class WorkspaceFiles(
         val revision = model.pendingFileRevision
         model.pendingFileRevision = null
         if (uri != null && revision != null) open(uri, revision)
+    }
+    private val importArchivePicker = activity.registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        val revision = model.pendingFileRevision
+        model.pendingFileRevision = null
+        if (uri != null && revision != null) importArchive(uri, revision)
+    }
+    private val exportArchivePicker = activity.registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        val json = model.pendingArchiveJson
+        model.pendingArchiveJson = null
+        if (uri != null && json != null) {
+            io("Could not export this project backup.") {
+                withContext(Dispatchers.IO) { NativeFiles.write(resolver, uri, json) }
+                message("Project backup exported")
+            }
+        }
     }
     private val createPickers = listOf("HTML", "CSS", "JS").associateWith { type ->
         activity.registerForActivityResult(ActivityResultContracts.CreateDocument(NativeFiles.mime(type))) { uri ->
@@ -87,10 +103,58 @@ class WorkspaceFiles(
             })
         }
         actions.add("Share runnable HTML" to shareFiddle)
+        actions.add("Export project backup" to ::exportArchive)
+        actions.add("Import project backup" to {
+            model.pendingFileRevision = model.projectRevision.value
+            importArchivePicker.launch(arrayOf("application/json", "text/plain"))
+        })
         AlertDialog.Builder(activity).setTitle("Files")
             .setItems(actions.map { it.first }.toTypedArray()) { _, index -> actions[index].second() }
             .setNegativeButton("Close", null)
             .show()
+    }
+
+    private fun exportArchive() {
+        val json = try {
+            model.exportProjectArchive()
+        } catch (error: Exception) {
+            message(error.message ?: "Could not prepare the project backup.")
+            return
+        }
+        model.pendingArchiveJson = json
+        val base = model.title.value.orEmpty().replace(Regex("[^a-zA-Z0-9_.-]"), "_")
+            .take(80).ifBlank { "easycode-project" }
+        exportArchivePicker.launch("$base.easycode.json")
+    }
+
+    private fun importArchive(uri: Uri, revision: Long) {
+        activity.lifecycleScope.launch {
+            try {
+                val archive = model.fileOperations.withLock {
+                    val json = withContext(Dispatchers.IO) {
+                        NativeFiles.read(resolver, uri, ProjectArchiveCodec.MAX_ARCHIVE_BYTES)
+                    }
+                    withContext(Dispatchers.Default) { ProjectArchiveCodec.decode(json) }
+                }
+                if (model.projectRevision.value != revision) {
+                    message("The current project changed. Choose the backup again to import it.")
+                    return@launch
+                }
+                val applyImport = {
+                    if (model.projectRevision.value == revision) {
+                        model.importProjectArchive(archive)
+                        message("Imported ${archive.title}")
+                    }
+                }
+                val main = activity as? MainActivity
+                if (main != null) main.confirmProjectChange(applyImport) else applyImport()
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                val reason = if (error is IllegalArgumentException || error is IllegalStateException) error.message else null
+                message(reason ?: "Could not import this project backup.")
+            }
+        }
     }
 
     private fun browseFolder() {

@@ -64,7 +64,8 @@ object NativeFiles {
         } ?: error("Could not read the selected folder.")
     }
 
-    fun read(resolver: ContentResolver, uri: Uri): String {
+    fun read(resolver: ContentResolver, uri: Uri, maxBytes: Int = MAX_IMPORT): String {
+        require(maxBytes > 0) { "Invalid import size limit." }
         val stream = resolver.openInputStream(uri) ?: error("Could not open the file.")
         return stream.use {
             val output = ByteArrayOutputStream()
@@ -72,7 +73,7 @@ object NativeFiles {
             while (true) {
                 val count = it.read(buffer)
                 if (count == -1) break
-                require(output.size() + count <= MAX_IMPORT) { "Choose a text file smaller than 512 KB." }
+                require(output.size() + count <= maxBytes) { "This file is larger than the supported import limit." }
                 output.write(buffer, 0, count)
             }
             val text = Charsets.UTF_8.newDecoder().decode(java.nio.ByteBuffer.wrap(output.toByteArray())).toString()

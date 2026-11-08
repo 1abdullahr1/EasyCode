@@ -8,7 +8,7 @@ import com.easycode.ide.util.ThemeManager
 class EasyCodeApp : Application() {
 
     val database by lazy { EasyCodeDatabase.getInstance(this) }
-    val fiddleRepository by lazy { FiddleRepository(database.fiddleDao()) }
+    val fiddleRepository by lazy { FiddleRepository(database.fiddleDao(), database.draftDao()) }
 
     override fun onCreate() {
         super.onCreate()
