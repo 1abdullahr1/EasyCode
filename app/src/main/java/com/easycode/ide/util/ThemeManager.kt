@@ -25,7 +25,7 @@ object ThemeManager {
 
     fun getSavedTheme(context: Context): Int {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        return prefs.getInt(KEY_THEME, THEME_DARK)
+        return prefs.getInt(KEY_THEME, THEME_SYSTEM)
     }
 
     private fun applyTheme(themeMode: Int) {
