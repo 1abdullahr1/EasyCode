@@ -43,6 +43,11 @@ jobs:
           echo "PLAY_UPLOAD_KEY_ALIAS=$KEY_ALIAS" >> "$GITHUB_ENV"
           echo "PLAY_UPLOAD_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
 
+      - name: Verify upload key alias
+        env:
+          STORE_PASSWORD: ${{ secrets.PLAY_UPLOAD_KEYSTORE_PASSWORD }}
+        run: keytool -list -keystore "$RUNNER_TEMP/easycode-upload.p12" -storepass "$STORE_PASSWORD" -v | grep -E '^Alias name:|^Entry type:'
+
       - name: Verify and build release bundle
         run: ./gradlew testReleaseUnitTest lintRelease bundleRelease --stacktrace
 
